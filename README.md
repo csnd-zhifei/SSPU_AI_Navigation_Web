@@ -3,6 +3,9 @@
 > AI驱动的个性化导航起始页，为上海第二工业大学师生打造高度可定制、信息层级清晰的学习导航体验。
 
 > 💡 **注意**：本项目由 AI 制作，作者仅在不断测试与优化。
+<img width="1926" height="1420" alt="image" src="https://github.com/user-attachments/assets/508000c8-7450-49f4-a544-ecda70fe5dd9" />
+<img width="2045" height="778" alt="image" src="https://github.com/user-attachments/assets/bda199f8-66e1-4393-9ad5-2bb0c1e389de" />
+<img width="1839" height="1391" alt="image" src="https://github.com/user-attachments/assets/d82e7a8e-e271-4583-9f18-e85d4224afd3" />
 
 ## 🎯 核心特性
 
