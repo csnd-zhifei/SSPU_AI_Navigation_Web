@@ -1,0 +1,3426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二工大 AI 轻导航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #F3F4F6;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease;
+        }
+
+        .search-tag {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .search-tag:hover {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .search-tag.active {
+            transform: translateY(-5px);
+            font-weight: 600;
+            color: inherit;
+        }
+
+        .search-tag.baidu.active { color: #2932E1; }
+        .search-tag.bing.active { color: #008373; }
+        .search-tag.google.active { color: #EA4335; }
+        .search-tag.ai.active { color: #4F46E5; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            height: 48px;
+            border-radius: 24px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            font-size: 16px;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .search-box:focus {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: none;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 16px;
+        }
+
+        .item-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .item-card:hover {
+            background: rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .item-card.highlighted {
+            background: rgba(239, 68, 68, 0.3);
+            border: 2px solid #EF4444;
+            animation: highlight-pulse 1.5s infinite;
+        }
+
+        @keyframes highlight-pulse {
+            0%, 100% { background-color: rgba(239, 68, 68, 0.3); }
+            50% { background-color: rgba(239, 68, 68, 0.5); }
+        }
+
+        .item-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            background: #6B7280;
+        }
+
+        .item-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        .item-name {
+            font-size: 12px;
+            color: #1F2937;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .dock-container {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: none;
+            border-radius: 16px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .dock-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            max-width: 900px;
+            justify-items: center;
+        }
+
+        .dock-item {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: white;
+        }
+
+        .dock-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dock-item.highlighted {
+            background: rgba(239, 68, 68, 0.3);
+            border: 2px solid #EF4444;
+            animation: highlight-pulse 1.5s infinite;
+        }
+
+        .dock-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            background: #6B7280;
+        }
+
+        .dock-item-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .dock-item-name {
+            font-size: 12px;
+            color: #1F2937;
+            margin-top: 4px;
+            text-align: center;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dock-add {
+            background: #F3F4F6;
+            color: #9CA3AF;
+        }
+
+        .dock-add:hover {
+            background: #E5E7EB;
+        }
+
+        /* AI 问答相关样式 */
+        .ai-recommended-item {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+            background: #F3F4F6;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            box-sizing: border-box;
+        }
+
+        .ai-recommended-item:hover {
+            background: #E5E7EB;
+            transform: translateX(2px);
+        }
+
+        .ai-recommended-item.highlighted-from-ai {
+            background: rgba(239, 68, 68, 0.10);
+            border: 2px solid #EF4444;
+        }
+
+        .ai-recommended-badge {
+            min-width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6B7280;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .ai-recommended-item.highlighted-from-ai .ai-recommended-badge {
+            background: #EF4444;
+        }
+
+        .ai-recommended-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            background: #6B7280;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .ai-recommended-item-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .ai-recommended-item-name {
+            font-size: 11px;
+            color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        #aiSplitter {
+            transition: background 0.15s ease;
+        }
+
+        #aiSplitter:hover {
+            background: #D1D5DB;
+        }
+
+        #aiSplitter.dragging {
+            background: #9CA3AF;
+        }
+
+        #aiResponseArea {
+            line-height: 1.6;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .ai-response-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .ai-response-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9CA3AF;
+        }
+
+        .ai-response-loading::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            margin: 0 4px;
+            background: #9CA3AF;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .ai-progress-container {
+            padding: 16px;
+            width: 100%;
+        }
+
+        .ai-progress-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+
+        .ai-progress-track {
+            width: 100%;
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .ai-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6366F1, #8B5CF6);
+            border-radius: 99px;
+            width: 0%;
+            transition: width 0.25s ease;
+        }
+
+        .ai-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .ai-summary-table th {
+            background: #F9FAFB;
+            color: #6B7280;
+            font-weight: 600;
+            padding: 5px 8px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .ai-summary-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #F3F4F6;
+            vertical-align: middle;
+            color: #374151;
+        }
+
+        .ai-summary-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ai-summary-table .st-num {
+            width: 22px;
+            text-align: center;
+            font-weight: bold;
+            color: #9CA3AF;
+        }
+
+        .ai-summary-table .st-num.in-main {
+            color: #EF4444;
+        }
+
+        .ai-summary-table .st-name {
+            font-weight: 500;
+            color: #1F2937;
+            white-space: nowrap;
+        }
+
+        .ai-summary-table .st-cat {
+            color: #6B7280;
+            white-space: nowrap;
+        }
+
+        .ai-summary-table .st-desc {
+            color: #9CA3AF;
+        }
+
+        .ai-summary-table tbody tr:hover {
+            background: #F9FAFB;
+            cursor: pointer;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 80vw;
+            max-width: 800px;
+            height: 70vh;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .subcategory-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .subcategory-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6B7280;
+            transition: all 0.15s ease;
+        }
+
+        .subcategory-tab:hover {
+            border-color: #4F46E5;
+            color: #4F46E5;
+        }
+
+        .subcategory-tab.active {
+            background: #4F46E5;
+            color: white;
+            border-color: #4F46E5;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 4px 0;
+            z-index: 300;
+            min-width: 150px;
+            display: none;
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #1F2937;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .context-menu-item:hover {
+            background: #F3F4F6;
+        }
+
+        .context-menu-item.danger {
+            color: #EF4444;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: #E5E7EB;
+            margin: 4px 0;
+        }
+
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 400;
+            min-width: 300px;
+            display: none;
+        }
+
+        .confirm-dialog.active {
+            display: block;
+        }
+
+        .confirm-dialog-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .confirm-dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-cancel {
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+
+        .btn-cancel:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-danger {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        .btn-primary {
+            background: #4F46E5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338CA;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 250;
+            padding: 24px;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 24px;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .settings-item-label {
+            font-size: 14px;
+            color: #1F2937;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #E5E7EB;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background: #4F46E5;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(20px);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .ai-chat-window {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            max-width: 90vw;
+            max-height: 400px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+        }
+
+        .ai-chat-window.active {
+            display: flex;
+        }
+
+        .ai-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .ai-chat-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: #4F46E5;
+            color: white;
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+
+        .ai-chat-input-container {
+            padding: 16px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 8px;
+        }
+
+        .ai-chat-input {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .ai-chat-input:focus {
+            border-color: #4F46E5;
+        }
+
+        .ai-chat-send {
+            padding: 8px 16px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .ai-chat-send:hover {
+            background: #4338CA;
+        }
+
+        .add-link-popup {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 250;
+            width: 280px;
+            display: none;
+        }
+
+        .add-link-popup.active {
+            display: block;
+        }
+
+        .add-link-popup-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 12px;
+        }
+
+        .add-link-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            outline: none;
+        }
+
+        .add-link-input:focus {
+            border-color: #4F46E5;
+        }
+
+        .add-link-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .add-link-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .gear-icon {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 150;
+            transition: all 0.2s ease;
+        }
+
+        .gear-icon:hover {
+            transform: rotate(30deg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .wallpaper-section {
+            margin-top: 16px;
+        }
+
+        .wallpaper-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            color: #1F2937;
+            margin-bottom: 8px;
+            transition: all 0.15s ease;
+        }
+
+        .wallpaper-btn:hover {
+            border-color: #4F46E5;
+            color: #4F46E5;
+        }
+
+        .wallpaper-upload {
+            display: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #E5E7EB;
+            border-top-color: #4F46E5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                max-width: 100%;
+                margin: 0 16px;
+            }
+
+            .dock-grid {
+                max-width: 100%;
+            }
+            
+            .keyboard-shortcut {
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                background: rgba(0, 0, 0, 0.6);
+                color: white;
+                font-size: 8px;
+                padding: 1px 3px;
+                border-radius: 3px;
+                font-weight: bold;
+                pointer-events: none;
+            }
+
+            .modal-content {
+                width: 95vw;
+                height: 80vh;
+            }
+
+            .ai-chat-window {
+                width: 95vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gear-icon" id="gearIcon">
+        <i class="fas fa-cog" style="color: #6B7280;"></i>
+    </div>
+
+    <div class="min-h-screen flex flex-col items-center pt-16 px-4 pb-32">
+        <h1 id="mainTitle" class="text-2xl font-bold text-gray-800 mb-8 text-center">二工大 AI 轻导航</h1>
+
+        <div class="flex gap-2 mb-4" id="searchTags">
+            <span class="search-tag baidu active" data-engine="baidu">百度</span>
+            <span class="search-tag bing" data-engine="bing">必应</span>
+            <span class="search-tag google" data-engine="google">谷歌</span>
+            <span class="search-tag ai" data-engine="ai">AI问答</span>
+        </div>
+
+        <div class="w-full max-w-[600px] relative" id="searchBoxContainer">
+            <input type="text" class="search-box" id="searchInput" placeholder="搜索或提问...">
+        </div>
+
+        <!-- AI 问答区域 -->
+        <div id="aiQuestionMode" style="width: 100%; max-width: 1200px; margin-top: 16px; height: 320px; border: 1px solid #E5E7EB; border-radius: 8px; background: white; flex-direction: column; display: none;">
+            <div style="padding: 12px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: bold; color: #1F2937; font-size: 16px;">AI 问答</span>
+                <button id="exitAiMode" style="background: none; border: none; cursor: pointer; color: #374151; font-size: 32px; padding: 0; width: 32px; height: 32px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: color 0.2s;" onmouseover="this.style.color='#1F2937'" onmouseout="this.style.color='#374151'">×</button>
+            </div>
+            <div style="display: flex; flex: 1; overflow: hidden;">
+                <!-- 左侧问答区域 -->
+                <div id="aiResponseArea" style="flex: 1; border-right: 1px solid #E5E7EB; padding: 12px; overflow-y: auto; font-size: 13px;">
+                    <div style="color: #9CA3AF; text-align: center;">等待提问...</div>
+                </div>
+                <!-- 分割线 -->
+                <div id="aiSplitter" style="width: 4px; background: #E5E7EB; cursor: col-resize; user-select: none; position: relative;"></div>
+                <!-- 右侧推荐网页 -->
+                <div id="aiRecommendedArea" style="width: 180px; min-width: 180px; padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="font-size: 11px; font-weight: bold; color: #6B7280; margin-bottom: 2px;">推荐资源</div>
+                    <div id="aiRecommendedItems" style="display: flex; flex-direction: column; gap: 4px;"></div>
+                </div>
+            </div>
+            <div style="padding: 8px; border-top: 1px solid #E5E7EB;">
+                <input type="text" id="aiQuestionInput" placeholder="输入问题，或输入数字 1-5 访问推荐网站..." style="width: 100%; padding: 6px; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                <div id="aiInputHint" style="font-size: 11px; color: #9CA3AF; margin-top: 4px; display: none;">💡 点击图标或输入编号 (1-5) 按 Enter 快速访问推荐网站；红色边框表示该站已在主导航区</div>
+            </div>
+        </div>
+
+        <div class="w-full max-w-6xl mt-8" id="categoriesContainer">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+    </div>
+
+    <div class="dock-container" id="dockContainer">
+        <div class="dock-grid" id="dockGrid"></div>
+    </div>
+
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">分类详情</h2>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times" style="color: #6B7280;"></i>
+                </button>
+            </div>
+            <div class="subcategory-tabs" id="subcategoryTabs"></div>
+            <div class="modal-body">
+                <div class="item-grid" id="modalItemGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="addToDock">添加到主页</div>
+        <div class="context-menu-item" data-action="addToCategory">添加到分类</div>
+        <div class="context-menu-item" data-action="addToFavorites">收藏</div>
+        <div class="context-menu-divider" id="deleteDivider"></div>
+        <div class="context-menu-item danger" data-action="delete" id="deleteMenuItem">删除</div>
+    </div>
+
+    <div id="categorySelectModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 500;">
+        <div style="background: white; border-radius: 12px; padding: 24px; min-width: 300px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1F2937;">选择分类</h3>
+            <div id="categorySelectList" style="margin-bottom: 16px; max-height: 300px; overflow-y: auto;"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button style="padding: 8px 16px; border-radius: 8px; border: none; background: #F3F4F6; color: #1F2937; cursor: pointer;" id="categorySelectCancel">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-dialog-title" id="confirmTitle">确定要删除吗？</div>
+        <div class="confirm-dialog-buttons">
+            <button class="btn btn-cancel" id="confirmCancel">取消</button>
+            <button class="btn btn-danger" id="confirmDelete">确认删除</button>
+        </div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <h2 class="settings-title">设置</h2>
+        
+        <div class="settings-section">
+            <div class="settings-section-title">界面控制</div>
+            <div class="settings-item">
+                <span class="settings-item-label">显示标签导航区</span>
+                <div class="toggle-switch active" id="toggleTagsArea"></div>
+            </div>
+            <div class="settings-item">
+                <span class="settings-item-label">自定义首页显示图标</span>
+                <div class="toggle-switch" id="toggleCustomMainDisplay"></div>
+            </div>
+            <button class="wallpaper-btn" id="configMainDisplayBtn" style="margin-top: 8px;">
+                <i class="fas fa-th-large" style="margin-right: 8px;"></i>配置首页默认显示
+            </button>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">搜索引擎</div>
+            <div class="checkbox-group" id="engineCheckboxes">
+                <label class="checkbox-item">
+                    <input type="checkbox" value="baidu" checked> 百度
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" value="bing" checked> 必应
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" value="google" checked> 谷歌
+                </label>
+                <label class="checkbox-item">
+                    <input type="checkbox" value="ai" checked> AI问答
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <div class="settings-section-title">快捷键</div>
+            <div class="settings-item">
+                <span class="settings-item-label">启用数字键快速访问</span>
+                <div class="toggle-switch active" id="toggleHotkeys"></div>
+            </div>
+            <p style="font-size: 12px; color: #6B7280; margin-top: 8px;">
+                按 1-9/0 快速访问 Dock 应用（1-9对应前9个，0对应第10个）<br/>
+                按 / 快速切换到 AI 问答<br/>
+                在删除确认窗口中按 Enter 键确认删除
+            </p>
+        </div>
+
+        <div class="settings-section wallpaper-section">
+            <div class="settings-section-title">壁纸设置</div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 14px; color: #1F2937; margin-bottom: 8px; display: block;">纯色背景</label>
+                <div id="colorPresets" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                    <div style="width: 32px; height: 32px; background: #FFFFFF; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#FFFFFF" title="白色"></div>
+                    <div style="width: 32px; height: 32px; background: #F3F4F6; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#F3F4F6" title="浅灰"></div>
+                    <div style="width: 32px; height: 32px; background: #E5E7EB; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#E5E7EB" title="灰色"></div>
+                    <div style="width: 32px; height: 32px; background: #1F2937; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#1F2937" title="深灰"></div>
+                    <div style="width: 32px; height: 32px; background: #4F46E5; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#4F46E5" title="蓝色"></div>
+                    <div style="width: 32px; height: 32px; background: #06B6D4; border-radius: 6px; cursor: pointer; border: 2px solid #E5E7EB;" class="color-preset" data-color="#06B6D4" title="青色"></div>
+                </div>
+                <input type="color" id="customColor" style="width: 50px; height: 32px; border: 1px solid #E5E7EB; border-radius: 6px; cursor: pointer;">
+            </div>
+
+            <div class="settings-item">
+                <span class="settings-item-label">启用模糊效果</span>
+                <div class="toggle-switch active" id="toggleBlur"></div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 14px; color: #1F2937; margin-bottom: 8px; display: block;">我的壁纸</label>
+                <div id="wallpaperGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-bottom: 8px; max-height: 200px; overflow-y: auto;">
+                    <div style="text-align: center; padding: 8px; color: #9CA3AF; font-size: 12px;">加载中...</div>
+                </div>
+            </div>
+
+            <button class="wallpaper-btn" id="uploadWallpaperBtn">
+                <i class="fas fa-upload" style="margin-right: 8px;"></i>上传壁纸
+            </button>
+            <input type="file" class="wallpaper-upload" id="wallpaperInput" accept="image/png,image/jpeg,image/webp">
+            <button class="wallpaper-btn" id="generateWallpaperBtn">
+                <i class="fas fa-magic" style="margin-right: 8px;"></i>AI 生成壁纸
+            </button>
+        </div>
+    </div>
+
+    <div id="mainDisplayConfigModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 550;">
+        <div style="background: white; border-radius: 12px; padding: 20px; width: min(900px, 94vw); max-height: 82vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1F2937;">配置首页默认显示图标</h3>
+            <p style="font-size: 12px; color: #6B7280; margin-bottom: 12px;">每个主分类最多选择 6 个。保存后，首页将按你的选择展示。</p>
+            <div id="mainDisplayConfigList"></div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button class="btn btn-cancel" id="mainDisplayConfigCancel">取消</button>
+                <button class="btn btn-primary" id="mainDisplayConfigSave">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 生成壁纸弹窗 -->
+    <div id="generateWallpaperModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 560;">
+        <div style="background: white; border-radius: 14px; padding: 24px; width: min(440px, 94vw); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);">
+            <h3 style="font-size: 18px; font-weight: 600; color: #1F2937; margin-bottom: 16px;">✨ AI 生成壁纸</h3>
+            <div style="margin-bottom: 14px;">
+                <label style="font-size: 13px; color: #374151; font-weight: 500; display: block; margin-bottom: 6px;">风格</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="wallpaper-style-btn active" data-style="anime" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #6366F1; background: #6366F1; color: white; font-size: 12px; cursor: pointer;">动漫</button>
+                    <button class="wallpaper-style-btn" data-style="realistic" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #E5E7EB; background: white; color: #374151; font-size: 12px; cursor: pointer;">写实</button>
+                    <button class="wallpaper-style-btn" data-style="abstract" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #E5E7EB; background: white; color: #374151; font-size: 12px; cursor: pointer;">抄象</button>
+                    <button class="wallpaper-style-btn" data-style="landscape" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #E5E7EB; background: white; color: #374151; font-size: 12px; cursor: pointer;">风景</button>
+                    <button class="wallpaper-style-btn" data-style="minimal" style="padding: 6px 14px; border-radius: 20px; border: 2px solid #E5E7EB; background: white; color: #374151; font-size: 12px; cursor: pointer;">极简</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 13px; color: #374151; font-weight: 500; display: block; margin-bottom: 6px;">描述（可选）</label>
+                <textarea id="wallpaperPromptInput" placeholder="例：晨曦校园，樱花盛开，山清水秀..." style="width: 100%; height: 80px; padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 13px; resize: none; box-sizing: border-box; outline: none;"></textarea>
+            </div>
+            <div id="wallpaperGenPreview" style="display: none; margin-bottom: 16px; border-radius: 8px; overflow: hidden; max-height: 200px;">
+                <img id="wallpaperGenPreviewImg" style="width: 100%; object-fit: cover; display: block;">
+            </div>
+            <div id="wallpaperGenStatus" style="display: none; text-align: center; padding: 12px; color: #6B7280; font-size: 13px;">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i>正在生成，请稍候（10~30秒）…
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button class="btn btn-cancel" id="wallpaperGenCancel">取消</button>
+                <button id="wallpaperGenApply" style="display: none; padding: 8px 16px; background: #10B981; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer;">设为壁纸</button>
+                <button class="btn btn-primary" id="wallpaperGenSubmit">开始生成</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-chat-window" id="aiChatWindow">
+        <div class="ai-chat-header">
+            <span class="ai-chat-title">AI 助手</span>
+            <button class="modal-close" id="aiChatClose">
+                <i class="fas fa-times" style="color: #6B7280;"></i>
+            </button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+        <div class="ai-chat-input-container">
+            <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="输入消息...">
+            <button class="ai-chat-send" id="aiChatSend">发送</button>
+        </div>
+    </div>
+
+    <div class="add-link-popup" id="addLinkPopup">
+        <div class="add-link-popup-title">添加快捷方式</div>
+        <input type="text" class="add-link-input" id="linkUrl" placeholder="输入网址">
+        <input type="text" class="add-link-input" id="linkName" placeholder="名称（自动获取）">
+        <select class="add-link-select" id="linkTarget">
+            <option value="dock">添加到主页</option>
+        </select>
+        <div class="add-link-buttons">
+            <button class="btn btn-cancel" id="addLinkCancel">取消</button>
+            <button class="btn btn-primary" id="addLinkConfirm">添加</button>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            data: null,
+            currentEngine: 'baidu',
+            currentCategory: null,
+            currentSubcategory: null,
+            highlightedIds: [],
+            contextMenuTarget: null,
+            aiChatContext: [],
+            mainVisibleItemIds: [],
+            aiRecommendedItems: []
+        };
+
+        // 首页每个主分类默认最多显示 6 个入口（3~6 的上限）
+        const MAIN_CATEGORY_VISIBLE_LIMIT = 6;
+
+        const searchUrls = {
+            baidu: 'https://www.baidu.com/s?wd=',
+            bing: 'https://www.bing.com/search?q=',
+            google: 'https://www.google.com/search?q='
+        };
+
+        function loadUserSettings() {
+            const saved = localStorage.getItem('user_settings');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                show_tags_area: true,
+                enabled_engines: ['baidu', 'bing', 'google', 'ai'],
+                hotkeys_enabled: true,
+                wallpaper_url: '',
+                background_color: '',
+                blur_enabled: true,
+                custom_main_display_enabled: false,
+                custom_main_display: {}
+            };
+        }
+
+        function saveUserSettings(settings) {
+            localStorage.setItem('user_settings', JSON.stringify(settings));
+        }
+
+        function loadHiddenPresets() {
+            const saved = localStorage.getItem('hidden_presets');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveHiddenPresets(hidden) {
+            localStorage.setItem('hidden_presets', JSON.stringify(hidden));
+        }
+
+        function hidePresetItem(itemId) {
+            const hidden = loadHiddenPresets();
+            if (!hidden.includes(itemId)) {
+                hidden.push(itemId);
+                saveHiddenPresets(hidden);
+            }
+        }
+
+        function showPresetItem(itemId) {
+            let hidden = loadHiddenPresets();
+            hidden = hidden.filter(id => id !== itemId);
+            saveHiddenPresets(hidden);
+        }
+
+        function loadUserDock() {
+            const saved = localStorage.getItem('user_dock');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return [];
+        }
+
+        function saveUserDock(dock) {
+            localStorage.setItem('user_dock', JSON.stringify(dock));
+        }
+
+        function loadUserNavItems() {
+            const saved = localStorage.getItem('user_nav_items');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return [];
+        }
+
+        function saveUserNavItems(items) {
+            localStorage.setItem('user_nav_items', JSON.stringify(items));
+        }
+
+        function loadCategoryUserItems(categoryId) {
+            const saved = localStorage.getItem(`user_category_items_${categoryId}`);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return [];
+        }
+
+        function saveCategoryUserItems(categoryId, items) {
+            localStorage.setItem(`user_category_items_${categoryId}`, JSON.stringify(items));
+        }
+
+        function generateId() {
+            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // 拖拽相关变量
+        let draggedItem = null;
+        
+        function handleDragStart(e) {
+            draggedItem = this;
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+            this.style.opacity = '0.5';
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            this.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+
+            // 从导航区拖到dock
+            if (draggedCategoryItem && draggedCategoryItemData) {
+                addItemToDock(draggedCategoryItemData);
+                draggedCategoryItem.style.opacity = '1';
+                draggedCategoryItem = null;
+                draggedCategoryItemData = null;
+                return;
+            }
+            
+            if (draggedItem !== this) {
+                const draggedId = draggedItem.dataset.id;
+                const targetId = this.dataset.id;
+                
+                let dockItems = loadUserDock();
+                const draggedIndex = dockItems.findIndex(item => item.id === draggedId);
+                const targetIndex = dockItems.findIndex(item => item.id === targetId);
+                
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    const [movedItem] = dockItems.splice(draggedIndex, 1);
+                    dockItems.splice(targetIndex, 0, movedItem);
+                    saveUserDock(dockItems);
+                    renderDock();
+                }
+            }
+            
+            draggedItem.style.opacity = '1';
+            draggedItem = null;
+        }
+
+        // 分类导航区拖拽排序
+        let draggedCategoryItem = null;
+        let draggedCategoryItemData = null;
+
+        function handleCategoryDragStart(e) {
+            draggedCategoryItem = this;
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+            setTimeout(() => { this.style.opacity = '0.5'; }, 0);
+        }
+
+        function handleCategoryDragOver(e) {
+            e.preventDefault();
+            this.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+        }
+
+        function handleCategoryDragEnd() {
+            if (draggedCategoryItem) draggedCategoryItem.style.opacity = '1';
+            draggedCategoryItem = null;
+            draggedCategoryItemData = null;
+            document.querySelectorAll('#categoriesContainer .item-card').forEach(el => el.style.backgroundColor = '');
+        }
+
+        function handleCategoryDrop(e) {
+            e.preventDefault();
+            document.querySelectorAll('#categoriesContainer .item-card').forEach(el => el.style.backgroundColor = '');
+            if (!draggedCategoryItem || draggedCategoryItem === this) return;
+
+            const draggedId = draggedCategoryItem.dataset.id;
+            const targetId = this.dataset.id;
+            const categoryId = draggedCategoryItem.dataset.categoryId;
+            if (!categoryId || categoryId !== this.dataset.categoryId) return;
+
+            const isUserItem = draggedCategoryItem.dataset.isUserItem === 'true';
+            if (isUserItem !== (this.dataset.isUserItem === 'true')) return;
+
+            if (isUserItem) {
+                let items = loadCategoryUserItems(categoryId);
+                const fromIdx = items.findIndex(i => i.id === draggedId);
+                const toIdx = items.findIndex(i => i.id === targetId);
+                if (fromIdx === -1 || toIdx === -1) return;
+                const [moved] = items.splice(fromIdx, 1);
+                items.splice(toIdx, 0, moved);
+                saveCategoryUserItems(categoryId, items);
+            } else {
+                const category = state.data.categories.find(c => c.id === categoryId);
+                if (!category) return;
+                const settings = loadUserSettings();
+                const customDisplay = settings.custom_main_display || {};
+                const hidden = loadHiddenPresets();
+                let currentIds;
+                if (settings.custom_main_display_enabled && Array.isArray(customDisplay[categoryId]) && customDisplay[categoryId].length > 0) {
+                    currentIds = [...customDisplay[categoryId]];
+                } else {
+                    const allItems = [];
+                    category.subcategories.forEach(sub => {
+                        sub.items.forEach(item => allItems.push({ item }));
+                    });
+                    allItems.sort((a, b) => scoreChinaFriendly(b.item) - scoreChinaFriendly(a.item));
+                    currentIds = allItems.filter(({ item }) => !hidden.includes(item.id)).map(({ item }) => item.id);
+                }
+                const fromIdx = currentIds.indexOf(draggedId);
+                const toIdx = currentIds.indexOf(targetId);
+                if (fromIdx === -1 || toIdx === -1) return;
+                currentIds.splice(fromIdx, 1);
+                currentIds.splice(toIdx, 0, draggedId);
+                settings.custom_main_display_enabled = true;
+                settings.custom_main_display = { ...customDisplay, [categoryId]: currentIds };
+                saveUserSettings(settings);
+                updateSettingsPanel();
+            }
+            renderCategories();
+        }
+
+        function getFaviconUrl(url) {
+            try {
+                const urlObj = new URL(url.startsWith('http') ? url : 'https://' + url);
+                return `/api/favicon?domain=${urlObj.hostname}`;
+            } catch {
+                return null;
+            }
+        }
+
+        function createIconElement(item, size = 'normal') {
+            const iconDiv = document.createElement('div');
+            iconDiv.className = size === 'dock' ? 'dock-item-icon' : 'item-icon';
+            
+            // 应用后备样式：黑底白字首字母
+            const applyFallbackStyle = () => {
+                iconDiv.innerHTML = '';
+                iconDiv.style.background = '#1F2937';
+                iconDiv.style.color = 'white';
+                iconDiv.style.display = 'flex';
+                iconDiv.style.alignItems = 'center';
+                iconDiv.style.justifyContent = 'center';
+                iconDiv.style.fontSize = size === 'dock' ? '18px' : '20px';
+                iconDiv.style.fontWeight = 'bold';
+                iconDiv.style.borderRadius = size === 'dock' ? '12px' : '8px';
+                const firstChar = (item.name || '?').charAt(0).toUpperCase();
+                const textNode = document.createTextNode(firstChar);
+                iconDiv.appendChild(textNode);
+            };
+            
+            if (item.icon_type === 'emoji') {
+                iconDiv.style.background = 'transparent';
+                iconDiv.style.fontSize = size === 'dock' ? '20px' : '24px';
+                iconDiv.textContent = item.icon;
+            } else if (item.icon) {
+                const img = document.createElement('img');
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.src = item.icon;
+                let settled = false;
+                const timer = setTimeout(() => {
+                    if (!settled) { settled = true; applyFallbackStyle(); }
+                }, 2000);
+                img.onload = () => { settled = true; clearTimeout(timer); };
+                img.onerror = () => {
+                    if (!settled) { settled = true; clearTimeout(timer); applyFallbackStyle(); }
+                };
+                iconDiv.appendChild(img);
+            } else {
+                const faviconUrl = getFaviconUrl(item.url);
+                if (faviconUrl) {
+                    const img = document.createElement('img');
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.src = faviconUrl;
+                    let settled = false;
+                    const timer = setTimeout(() => {
+                        if (!settled) { settled = true; applyFallbackStyle(); }
+                    }, 2000);
+                    img.onload = () => { settled = true; clearTimeout(timer); };
+                    img.onerror = () => {
+                        if (!settled) { settled = true; clearTimeout(timer); applyFallbackStyle(); }
+                    };
+                    iconDiv.appendChild(img);
+                } else {
+                    applyFallbackStyle();
+                }
+            }
+            
+            return iconDiv;
+        }
+
+        function scoreChinaFriendly(item) {
+            const url = (item.url || '').toLowerCase();
+            const name = (item.name || '').toLowerCase();
+            const keywords = Array.isArray(item.keywords) ? item.keywords.join(' ').toLowerCase() : '';
+
+            let score = 0;
+
+            // 更偏向中国可访问或国内站点
+            if (url.includes('.cn') || url.includes('.com.cn')) score += 5;
+            if (url.includes('qq.com') || url.includes('baidu.com') || url.includes('aliyun.com') || url.includes('douyin.com')) score += 4;
+
+            // 明确偏国外、在国内常受限的网站降权
+            if (url.includes('google.com') || url.includes('openai.com') || url.includes('claude.ai') || url.includes('perplexity.ai')) score -= 6;
+
+            // 名称与关键词中出现中文或本地化特征加分
+            if (/[\u4e00-\u9fa5]/.test(name)) score += 2;
+            if (/[\u4e00-\u9fa5]/.test(keywords)) score += 1;
+
+            return score;
+        }
+
+        function getCategoryPresetItems(category) {
+            const items = [];
+            category.subcategories.forEach(subcategory => {
+                subcategory.items.forEach(item => {
+                    items.push({ item, subcategoryId: subcategory.id });
+                });
+            });
+            return items;
+        }
+
+        function getCustomVisibleItemsForCategory(category, allPresetItems) {
+            const settings = loadUserSettings();
+            if (!settings.custom_main_display_enabled) return null;
+
+            const customDisplay = settings.custom_main_display || {};
+            const selectedIds = customDisplay[category.id];
+            if (!Array.isArray(selectedIds)) return null;
+            // 空数组表示用户主动清空，返回空数组（不显示任何预置图标）
+
+            const visible = [];
+            selectedIds.forEach(id => {
+                const found = allPresetItems.find(x => x.item.id === id);
+                if (found) visible.push(found);
+            });
+
+            return visible;
+        }
+
+        function openMainDisplayConfigModal() {
+            if (!state.data || !state.data.categories) {
+                alert('数据尚未加载完成');
+                return;
+            }
+
+            const settings = loadUserSettings();
+            const customDisplay = settings.custom_main_display || {};
+            const container = document.getElementById('mainDisplayConfigList');
+            container.innerHTML = '';
+            const hidden = loadHiddenPresets();
+
+            state.data.categories.forEach(category => {
+                const section = document.createElement('div');
+                section.style.cssText = 'border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px; margin-bottom: 10px;';
+
+                const title = document.createElement('div');
+                title.style.cssText = 'font-size: 15px; font-weight: 600; color: #1F2937; margin-bottom: 8px;';
+                title.textContent = `${category.name}（最多 6 个）`;
+                section.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;';
+
+                const presetItems = getCategoryPresetItems(category)
+                    .sort((a, b) => scoreChinaFriendly(b.item) - scoreChinaFriendly(a.item));
+
+                const hasSavedConfig = Array.isArray(customDisplay[category.id]);
+                const savedIds = hasSavedConfig ? customDisplay[category.id] : [];
+                const defaultIds = presetItems
+                    .filter(({ item }) => !hidden.includes(item.id))
+                    .slice(0, MAIN_CATEGORY_VISIBLE_LIMIT)
+                    .map(({ item }) => item.id);
+                // 只有从未配置过（customDisplay中没有该分类的key）时才回退到默认选中
+                const selectedSet = new Set(hasSavedConfig ? savedIds : defaultIds);
+
+                presetItems.forEach(({ item }) => {
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display: flex; align-items: center; gap: 6px; font-size: 12px; color: #374151; cursor: pointer;';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = item.id;
+                    checkbox.dataset.categoryId = category.id;
+                    checkbox.checked = selectedSet.has(item.id);
+
+                    checkbox.addEventListener('change', function() {
+                        const categoryId = this.dataset.categoryId;
+                        const allChecks = Array.from(container.querySelectorAll(`input[data-category-id="${categoryId}"]:checked`));
+                        if (allChecks.length > MAIN_CATEGORY_VISIBLE_LIMIT) {
+                            this.checked = false;
+                            alert(`每个主分类最多只能选择 ${MAIN_CATEGORY_VISIBLE_LIMIT} 个`);
+                        }
+                    });
+
+                    const name = document.createElement('span');
+                    name.textContent = item.name;
+
+                    label.appendChild(checkbox);
+                    label.appendChild(name);
+                    grid.appendChild(label);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+            document.getElementById('mainDisplayConfigModal').style.display = 'flex';
+        }
+
+        function saveMainDisplayConfig() {
+            const container = document.getElementById('mainDisplayConfigList');
+            const settings = loadUserSettings();
+            const newConfig = {};
+
+            if (state.data && state.data.categories) {
+                state.data.categories.forEach(category => {
+                    const checked = Array.from(
+                        container.querySelectorAll(`input[data-category-id="${category.id}"]:checked`)
+                    ).map(el => el.value).slice(0, MAIN_CATEGORY_VISIBLE_LIMIT);
+                    newConfig[category.id] = checked;
+                });
+            }
+
+            settings.custom_main_display = newConfig;
+            settings.custom_main_display_enabled = true;
+            saveUserSettings(settings);
+            document.getElementById('mainDisplayConfigModal').style.display = 'none';
+            updateSettingsPanel();
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            const grid = container.querySelector('.grid');
+            const settings = loadUserSettings();
+            
+            console.log('Rendering categories...');
+            console.log('Data:', state.data);
+            console.log('Settings:', settings);
+            
+            if (!settings.show_tags_area) {
+                console.log('Tags area 被禁用，隐藏container');
+                container.style.display = 'none';
+                return;
+            }
+            
+            // 始终显示container
+            container.style.display = 'block';
+            console.log('Container已显示');
+            
+            if (!grid) {
+                console.error('Grid element not found');
+                return;
+            }
+            
+            grid.innerHTML = '';
+            state.mainVisibleItemIds = [];
+            
+            if (!state.data || !state.data.categories) {
+                console.error('No data or categories');
+                return;
+            }
+            
+            console.log('Categories count:', state.data.categories.length);
+            
+            state.data.categories.forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                
+                const title = document.createElement('h2');
+                title.className = 'category-title';
+                title.innerHTML = `<i class="fas ${category.icon || 'fa-folder'}" style="margin-right: 8px;"></i>${category.name}`;
+                title.style.cursor = 'pointer';
+                title.addEventListener('click', () => openCategoryModal(category));
+                card.appendChild(title);
+                
+                const scrollContainer = document.createElement('div');
+                scrollContainer.style.cssText = 'max-height: 260px; overflow-y: auto; padding-right: 2px;';
+
+                const grid = document.createElement('div');
+                grid.className = 'item-grid';
+                
+                const hidden = loadHiddenPresets();
+
+                // 主分类首页仅展示少量入口：先按中国可访问优先，再截断到上限
+                const allPresetItems = [];
+                category.subcategories.forEach(subcategory => {
+                    subcategory.items.forEach(item => {
+                        allPresetItems.push({ item, subcategoryId: subcategory.id });
+                    });
+                });
+
+                allPresetItems.sort((a, b) => scoreChinaFriendly(b.item) - scoreChinaFriendly(a.item));
+                const customVisibleItems = getCustomVisibleItemsForCategory(category, allPresetItems);
+                const visiblePresetItems = customVisibleItems !== null
+                    ? customVisibleItems
+                    : allPresetItems.filter(({ item }) => !hidden.includes(item.id));
+
+                visiblePresetItems.forEach(({ item, subcategoryId }) => {
+                    state.mainVisibleItemIds.push(item.id);
+
+                    const itemCard = document.createElement('div');
+                    itemCard.className = 'item-card';
+                    itemCard.dataset.id = item.id;
+                    itemCard.dataset.categoryId = category.id;
+                    itemCard.dataset.subcategoryId = subcategoryId;
+                    itemCard.dataset.isPreset = 'true';
+
+                    if (state.highlightedIds.includes(item.id)) {
+                        itemCard.classList.add('highlighted');
+                    }
+
+                    const iconDiv = createIconElement(item);
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'item-name';
+                    nameDiv.textContent = item.name;
+
+                    itemCard.appendChild(iconDiv);
+                    itemCard.appendChild(nameDiv);
+
+                    itemCard.draggable = true;
+                    itemCard.addEventListener('dragstart', (e) => { draggedCategoryItemData = item; handleCategoryDragStart.call(itemCard, e); });
+                    itemCard.addEventListener('dragover', handleCategoryDragOver);
+                    itemCard.addEventListener('drop', handleCategoryDrop);
+                    itemCard.addEventListener('dragend', handleCategoryDragEnd);
+                    itemCard.addEventListener('click', () => window.open(item.url, '_blank'));
+                    itemCard.addEventListener('contextmenu', (e) => showContextMenu(e, item, true, false));
+
+                    grid.appendChild(itemCard);
+                });
+
+                scrollContainer.appendChild(grid);
+
+                // 显示该分类下的用户添加项目
+                const categoryUserItems = loadCategoryUserItems(category.id);
+                if (categoryUserItems.length > 0) {
+                    const userItemsGrid = document.createElement('div');
+                    userItemsGrid.className = 'item-grid';
+                    userItemsGrid.style.borderTop = '1px solid #E5E7EB';
+                    userItemsGrid.style.paddingTop = '12px';
+                    userItemsGrid.style.marginTop = '12px';
+                    
+                    categoryUserItems.forEach(item => {
+                        const itemCard = document.createElement('div');
+                        itemCard.className = 'item-card';
+                        itemCard.dataset.id = item.id;
+                        itemCard.dataset.isUserItem = 'true';
+                        itemCard.dataset.categoryId = category.id;
+                        
+                        if (state.highlightedIds.includes(item.id)) {
+                            itemCard.classList.add('highlighted');
+                        }
+                        
+                        const iconDiv = createIconElement(item);
+                        const nameDiv = document.createElement('div');
+                        nameDiv.className = 'item-name';
+                        nameDiv.textContent = item.name;
+                        
+                        itemCard.appendChild(iconDiv);
+                        itemCard.appendChild(nameDiv);
+                        
+                        itemCard.draggable = true;
+                        itemCard.addEventListener('dragstart', (e) => { draggedCategoryItemData = item; handleCategoryDragStart.call(itemCard, e); });
+                        itemCard.addEventListener('dragover', handleCategoryDragOver);
+                        itemCard.addEventListener('drop', handleCategoryDrop);
+                        itemCard.addEventListener('dragend', handleCategoryDragEnd);
+                        itemCard.addEventListener('click', () => window.open(item.url, '_blank'));
+                        itemCard.addEventListener('contextmenu', (e) => showContextMenu(e, item, false));
+                        
+                        userItemsGrid.appendChild(itemCard);
+                    });
+                    
+                    card.appendChild(scrollContainer);
+                    card.appendChild(userItemsGrid);
+                } else {
+                    card.appendChild(scrollContainer);
+                }
+                document.getElementById('categoriesContainer').querySelector('.grid').appendChild(card);
+            });
+            
+            const userNavItems = loadUserNavItems();
+            if (userNavItems.length > 0) {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                
+                const title = document.createElement('h2');
+                title.className = 'category-title';
+                title.innerHTML = '<i class="fas fa-star" style="margin-right: 8px;"></i>我的收藏';
+                card.appendChild(title);
+                
+                const grid = document.createElement('div');
+                grid.className = 'item-grid';
+                
+                userNavItems.forEach(item => {
+                    const itemCard = document.createElement('div');
+                    itemCard.className = 'item-card';
+                    itemCard.dataset.id = item.id;
+                    itemCard.dataset.isUserItem = 'true';
+                    
+                    if (state.highlightedIds.includes(item.id)) {
+                        itemCard.classList.add('highlighted');
+                    }
+                    
+                    const iconDiv = createIconElement(item);
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'item-name';
+                    nameDiv.textContent = item.name;
+                    
+                    itemCard.appendChild(iconDiv);
+                    itemCard.appendChild(nameDiv);
+                    
+                    itemCard.addEventListener('click', () => window.open(item.url, '_blank'));
+                    itemCard.addEventListener('contextmenu', (e) => showContextMenu(e, item, false));
+                    
+                    grid.appendChild(itemCard);
+                });
+                
+                card.appendChild(grid);
+                document.getElementById('categoriesContainer').querySelector('.grid').appendChild(card);
+            }
+        }
+
+        function renderDock() {
+            const dockGrid = document.getElementById('dockGrid');
+            console.log('Rendering dock...');
+            
+            if (!dockGrid) {
+                console.error('Dock grid not found');
+                return;
+            }
+            
+            dockGrid.innerHTML = '';
+            
+            const dockItems = loadUserDock();
+            console.log('Dock items:', dockItems);
+            
+            dockItems.forEach((item, index) => {
+                const dockItem = document.createElement('div');
+                dockItem.className = 'dock-item';
+                dockItem.dataset.id = item.id;
+                dockItem.dataset.index = index;
+                dockItem.dataset.isUserItem = 'true';
+                dockItem.draggable = true;
+                dockItem.style.position = 'relative';
+                
+                if (state.highlightedIds.includes(item.id)) {
+                    dockItem.classList.add('highlighted');
+                }
+                
+                const iconDiv = createIconElement(item, 'dock');
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'dock-item-name';
+                nameDiv.textContent = item.name;
+                
+                dockItem.appendChild(iconDiv);
+                dockItem.appendChild(nameDiv);
+                
+                // 添加快捷键标签（1-9对应index 0-8，0对应index 9）
+                if (index < 10) {
+                    const shortcutLabel = document.createElement('div');
+                    shortcutLabel.className = 'keyboard-shortcut';
+                    shortcutLabel.textContent = index === 9 ? '0' : (index + 1);
+                    dockItem.appendChild(shortcutLabel);
+                }
+                
+                dockItem.addEventListener('click', () => window.open(item.url, '_blank'));
+                dockItem.addEventListener('contextmenu', (e) => showContextMenu(e, item, false));
+                
+                // 拖拽事件
+                dockItem.addEventListener('dragstart', handleDragStart);
+                dockItem.addEventListener('dragover', handleDragOver);
+                dockItem.addEventListener('drop', handleDrop);
+                
+                dockGrid.appendChild(dockItem);
+            });
+            
+            const addItem = document.createElement('div');
+            addItem.className = 'dock-item dock-add';
+            addItem.id = 'addDockItem';
+            addItem.innerHTML = '<i class="fas fa-plus" style="font-size: 20px;"></i>';
+            
+            addItem.addEventListener('click', showAddLinkPopup);
+            
+            dockGrid.appendChild(addItem);
+
+            // 允许从导航区把图标拖到dock空白区域
+            dockGrid.addEventListener('dragover', (e) => e.preventDefault());
+            dockGrid.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (draggedCategoryItem && draggedCategoryItemData) {
+                    addItemToDock(draggedCategoryItemData);
+                    draggedCategoryItem.style.opacity = '1';
+                    draggedCategoryItem = null;
+                    draggedCategoryItemData = null;
+                }
+            });
+
+            updatePagePadding();
+        }
+
+        function updatePagePadding() {
+            const dockContainer = document.getElementById('dockContainer');
+            const mainWrap = document.querySelector('.min-h-screen.flex.flex-col.items-center');
+            if (!dockContainer || !mainWrap) return;
+            const dockH = dockContainer.offsetHeight;
+            mainWrap.style.paddingBottom = (dockH + 40) + 'px';
+        }
+
+        window.addEventListener('resize', updatePagePadding);
+
+        function openCategoryModal(category, subcategoryId = null) {
+            state.currentCategory = category;
+            
+            document.getElementById('modalTitle').textContent = category.name;
+            
+            const tabsContainer = document.getElementById('subcategoryTabs');
+            tabsContainer.innerHTML = '';
+            
+            const firstSubcategoryId = subcategoryId || (category.subcategories[0] && category.subcategories[0].id);
+            state.currentSubcategory = firstSubcategoryId;
+            
+            category.subcategories.forEach(subcategory => {
+                const tab = document.createElement('span');
+                tab.className = 'subcategory-tab';
+                tab.textContent = subcategory.name;
+                tab.dataset.id = subcategory.id;
+                
+                if (subcategory.id === firstSubcategoryId) {
+                    tab.classList.add('active');
+                }
+                
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.subcategory-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    state.currentSubcategory = subcategory.id;
+                    renderModalItems(subcategory);
+                });
+                
+                tabsContainer.appendChild(tab);
+            });
+            
+            const firstSubcategory = category.subcategories.find(s => s.id === firstSubcategoryId);
+            if (firstSubcategory) {
+                renderModalItems(firstSubcategory);
+            }
+            
+            document.getElementById('categoryModal').classList.add('active');
+        }
+
+        function renderModalItems(subcategory) {
+            const grid = document.getElementById('modalItemGrid');
+            grid.innerHTML = '';
+            
+            // 二级菜单只显示预置项目（固定的应用）
+            subcategory.items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+                itemCard.dataset.id = item.id;
+                itemCard.dataset.isPreset = 'true';
+                
+                if (state.highlightedIds.includes(item.id)) {
+                    itemCard.classList.add('highlighted');
+                }
+                
+                const iconDiv = createIconElement(item);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'item-name';
+                nameDiv.textContent = item.name;
+                
+                const descDiv = document.createElement('div');
+                descDiv.style.fontSize = '10px';
+                descDiv.style.color = '#6B7280';
+                descDiv.style.textAlign = 'center';
+                descDiv.style.marginTop = '4px';
+                descDiv.textContent = item.description || '';
+                
+                itemCard.appendChild(iconDiv);
+                itemCard.appendChild(nameDiv);
+                if (item.description) itemCard.appendChild(descDiv);
+                
+                itemCard.addEventListener('click', () => window.open(item.url, '_blank'));
+                itemCard.addEventListener('contextmenu', (e) => showContextMenu(e, item, true, true));
+                
+                grid.appendChild(itemCard);
+            });
+        }
+
+        function showContextMenu(e, item, isPreset, isInModal = false) {
+            e.preventDefault();
+            
+            state.contextMenuTarget = item;
+            state.contextMenuIsInModal = isInModal;
+            state.contextMenuIsPreset = isPreset;
+            
+            const menu = document.getElementById('contextMenu');
+            const deleteItem = document.getElementById('deleteMenuItem');
+            const deleteDivider = document.getElementById('deleteDivider');
+            const addToCategoryItem = menu.querySelector('[data-action="addToCategory"]');
+            
+            // 在模态框内的预置项不显示删除选项
+            if (isPreset && isInModal) {
+                deleteItem.style.display = 'none';
+                deleteDivider.style.display = 'none';
+            } else {
+                deleteItem.style.display = 'block';
+                deleteDivider.style.display = 'block';
+            }
+            
+            // 在模态框内，改变"添加到分类"的文本
+            if (isInModal) {
+                addToCategoryItem.textContent = '添加到当前分类';
+            } else {
+                addToCategoryItem.textContent = '添加到分类';
+            }
+            
+            // 暂时显示菜单以获取其尺寸
+            menu.classList.add('active');
+            
+            let x = e.clientX;
+            let y = e.clientY;
+            
+            // 检查菜单是否会超出视口
+            const menuRect = menu.getBoundingClientRect();
+            const menuWidth = menuRect.width;
+            const menuHeight = menuRect.height;
+            
+            // 如果菜单会超出右边界，调整x位置
+            if (x + menuWidth > window.innerWidth) {
+                x = window.innerWidth - menuWidth - 10;
+            }
+            
+            // 如果菜单会超出下边界，调整y位置
+            if (y + menuHeight > window.innerHeight) {
+                y = window.innerHeight - menuHeight - 10;
+            }
+            
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+        }
+
+        function hideContextMenu() {
+            document.getElementById('contextMenu').classList.remove('active');
+        }
+
+        function showConfirmDialog(itemName) {
+            document.getElementById('confirmTitle').textContent = `确定要删除 "${itemName}" 吗？`;
+            document.getElementById('confirmDialog').classList.add('active');
+        }
+
+        function hideConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('active');
+        }
+
+        function showCategorySelectModal(item) {
+            const modal = document.getElementById('categorySelectModal');
+            const list = document.getElementById('categorySelectList');
+            list.innerHTML = '';
+            
+            if (state.data && state.data.categories) {
+                state.data.categories.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.style.cssText = 'padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s ease;';
+                    categoryDiv.textContent = category.name;
+                    
+                    categoryDiv.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#F3F4F6';
+                    });
+                    
+                    categoryDiv.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = '';
+                    });
+                    
+                    categoryDiv.addEventListener('click', () => {
+                        const categoryItems = loadCategoryUserItems(category.id);
+                        const newItem = { 
+                            id: generateId(),
+                            name: item.name,
+                            url: item.url,
+                            icon: item.icon,
+                            icon_type: item.icon_type || 'favicon',
+                            added_at: Date.now()
+                        };
+                        categoryItems.push(newItem);
+                        saveCategoryUserItems(category.id, categoryItems);
+                        renderCategories();
+                        modal.style.display = 'none';
+                    });
+                    
+                    list.appendChild(categoryDiv);
+                });
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function deleteItem(item) {
+            // 如果是预置项，隐藏而不是删除
+            if (state.contextMenuIsPreset) {
+                hidePresetItem(item.id);
+            } else {
+                // 用户添加的项，真的删除
+                let dock = loadUserDock();
+                dock = dock.filter(i => i.id !== item.id);
+                saveUserDock(dock);
+                
+                let navItems = loadUserNavItems();
+                navItems = navItems.filter(i => i.id !== item.id);
+                saveUserNavItems(navItems);
+                
+                // 从所有分类中删除该项
+                if (state.data && state.data.categories) {
+                    state.data.categories.forEach(category => {
+                        const categoryItems = loadCategoryUserItems(category.id);
+                        const filtered = categoryItems.filter(i => i.id !== item.id);
+                        if (filtered.length < categoryItems.length) {
+                            saveCategoryUserItems(category.id, filtered);
+                        }
+                    });
+                }
+            }
+            
+            renderDock();
+            renderCategories();
+            if (state.currentCategory && state.currentSubcategory) {
+                const currentSubcategory = state.currentCategory.subcategories.find(s => s.id === state.currentSubcategory);
+                if (currentSubcategory) {
+                    renderModalItems(currentSubcategory);
+                }
+            }
+            hideConfirmDialog();
+        }
+        
+
+        function addItemToDock(item) {
+            const dock = loadUserDock();
+            
+            if (dock.some(i => i.id === item.id)) {
+                alert('该图标已在主页中');
+                return;
+            }
+            
+            const newItem = {
+                id: item.id || generateId(),
+                name: item.name,
+                url: item.url,
+                icon: item.icon,
+                icon_type: item.icon_type || 'favicon',
+                added_at: Date.now()
+            };
+            
+            dock.push(newItem);
+            saveUserDock(dock);
+            renderDock();
+        }
+
+        function addItemToCurrentCategory(item) {
+            if (!state.currentCategory) {
+                alert('未选择分类');
+                return;
+            }
+            const categoryId = state.currentCategory.id;
+            const items = loadCategoryUserItems(categoryId);
+            
+            const newItem = {
+                id: item.id || generateId(),
+                name: item.name,
+                url: item.url,
+                icon: item.icon,
+                icon_type: item.icon_type || 'favicon',
+                added_at: Date.now()
+            };
+            
+            items.push(newItem);
+            saveCategoryUserItems(categoryId, items);
+            
+            // 重新渲染当前子分类以显示新添加的项目
+            const currentSubcategory = state.currentCategory.subcategories.find(s => s.id === state.currentSubcategory);
+            if (currentSubcategory) {
+                renderModalItems(currentSubcategory);
+            }
+        }
+
+        function addItemToFavorites(item) {
+            const favorites = loadUserNavItems();
+            
+            const newItem = {
+                id: item.id || generateId(),
+                name: item.name,
+                url: item.url,
+                icon: item.icon,
+                icon_type: item.icon_type || 'favicon',
+                added_at: Date.now()
+            };
+            
+            favorites.push(newItem);
+            saveUserNavItems(favorites);
+            renderDock();
+            renderCategories();
+        }
+
+        function renderDockAndNav() {
+            renderDock();
+            renderCategories();
+        }
+
+        function showAddLinkPopup() {
+            const popup = document.getElementById('addLinkPopup');
+            const addBtn = document.getElementById('addDockItem');
+            const rect = addBtn.getBoundingClientRect();
+            
+            popup.style.left = (rect.left - 150) + 'px';
+            popup.style.top = (rect.top - 200) + 'px';
+            popup.classList.add('active');
+            
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkName').value = '';
+            
+            updateTargetSelect();
+        }
+
+        function hideAddLinkPopup() {
+            document.getElementById('addLinkPopup').classList.remove('active');
+            // 清空表单内容
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkName').value = '';
+        }
+
+        function updateTargetSelect() {
+            const select = document.getElementById('linkTarget');
+            select.innerHTML = '<option value="dock">添加到主页</option>';
+            
+            if (state.data && state.data.categories) {
+                state.data.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = 'category_' + category.id;
+                    option.textContent = '添加到 ' + category.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        async function fetchTitle(url) {
+            try {
+                const response = await fetch(`/api/fetch_title?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                return data.success ? data.title : '';
+            } catch {
+                return '';
+            }
+        }
+
+        async function handleAddLink() {
+            const url = document.getElementById('linkUrl').value.trim();
+            let name = document.getElementById('linkName').value.trim();
+            const target = document.getElementById('linkTarget').value;
+            
+            if (!url) {
+                alert('请输入网址');
+                return;
+            }
+            
+            // 立即关闭表单（防止用户重复点击）
+            hideAddLinkPopup();
+            
+            // 在后台异步处理添加
+            (async () => {
+                try {
+                    // 如果用户没有手动输入名称，尝试自动获取，最多等待5秒
+                    if (!name) {
+                        console.log('等待自动获取网页标题...');
+                        
+                        // 启动自动获取
+                        const fetchPromise = fetchTitle(url);
+                        
+                        // 最多等5秒
+                        const timeoutPromise = new Promise(resolve => {
+                            setTimeout(() => resolve(''), 5000);
+                        });
+                        
+                        // 取先完成的那个
+                        name = await Promise.race([fetchPromise, timeoutPromise]);
+                        
+                        if (name) {
+                            console.log('获取到标题:', name);
+                        } else {
+                            console.log('标题获取超时或失败');
+                        }
+                    }
+                    
+                    // 如果还是没有名称，使用网址的hostname
+                    if (!name) {
+                        name = new URL(url.startsWith('http') ? url : 'https://' + url).hostname;
+                    }
+                    
+                    const newItem = {
+                        id: generateId(),
+                        name: name,
+                        url: url.startsWith('http') ? url : 'https://' + url,
+                        icon: getFaviconUrl(url),
+                        icon_type: 'favicon',
+                        added_at: Date.now()
+                    };
+                    
+                    let targetName = '';
+                    if (target === 'dock') {
+                        addItemToDock(newItem);
+                        targetName = '主页';
+                    } else if (target.startsWith('category_')) {
+                        const categoryId = target.replace('category_', '');
+                        // 添加到对应分类
+                        const categoryUserItems = loadCategoryUserItems(categoryId);
+                        categoryUserItems.push(newItem);
+                        saveCategoryUserItems(categoryId, categoryUserItems);
+                        renderCategories();
+                        
+                        // 找到分类名
+                        const category = state.data.categories.find(c => c.id === categoryId);
+                        targetName = category ? category.name : '分类';
+                    }
+                    
+                    // 显示成功提醒
+                    const successMsg = document.createElement('div');
+                    successMsg.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #4CAF50;
+                        color: white;
+                        padding: 16px 24px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        z-index: 10000;
+                        animation: slideInRight 0.3s ease-out;
+                        max-width: 300px;
+                        word-wrap: break-word;
+                    `;
+                    successMsg.innerHTML = `✓ 已添加 "<strong>${escapeHtml(name)}</strong>" 到 ${targetName}`;
+                    document.body.appendChild(successMsg);
+                    
+                    // 3秒后自动消失
+                    setTimeout(() => {
+                        successMsg.style.animation = 'slideOutRight 0.3s ease-out';
+                        setTimeout(() => successMsg.remove(), 300);
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('添加失败:', error);
+                    // 显示错误提醒
+                    const errorMsg = document.createElement('div');
+                    errorMsg.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #F44336;
+                        color: white;
+                        padding: 16px 24px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        z-index: 10000;
+                        animation: slideInRight 0.3s ease-out;
+                    `;
+                    errorMsg.innerHTML = `✗ 添加失败，请重试`;
+                    document.body.appendChild(errorMsg);
+                    
+                    setTimeout(() => {
+                        errorMsg.style.animation = 'slideOutRight 0.3s ease-out';
+                        setTimeout(() => errorMsg.remove(), 300);
+                    }, 3000);
+                }
+            })();
+        }
+
+        function clearHighlights() {
+            state.highlightedIds = [];
+            document.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+        }
+
+        function highlightItems(ids) {
+            clearHighlights();
+            state.highlightedIds = ids;
+            
+            ids.forEach(id => {
+                document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
+                    el.classList.add('highlighted');
+                });
+            });
+        }
+
+        async function handleAiQuestion() {
+            const question = document.getElementById('aiQuestionInput').value.trim();
+            
+            if (!question) return;
+            
+            // 显示进度条
+            const responseArea = document.getElementById('aiResponseArea');
+            responseArea.innerHTML = `
+                <div class="ai-progress-container">
+                    <div class="ai-progress-label" id="aiProgressLabel">AI 思考中...</div>
+                    <div class="ai-progress-track"><div class="ai-progress-bar" id="aiProgressBar"></div></div>
+                </div>`;
+
+            let prog = 0;
+            const _progressInterval = setInterval(() => {
+                const bar = document.getElementById('aiProgressBar');
+                const label = document.getElementById('aiProgressLabel');
+                if (!bar) { clearInterval(_progressInterval); return; }
+                prog = Math.min(prog + (88 - prog) * 0.1 + 0.5, 88);
+                bar.style.width = prog + '%';
+                if (label) {
+                    if (prog < 35) label.textContent = 'AI 思考中...';
+                    else if (prog < 65) label.textContent = '正在匹配资源...';
+                    else label.textContent = '即将完成...';
+                }
+            }, 200);
+
+            const finishProgress = async () => {
+                clearInterval(_progressInterval);
+                const bar = document.getElementById('aiProgressBar');
+                const label = document.getElementById('aiProgressLabel');
+                if (bar) bar.style.width = '100%';
+                if (label) label.textContent = '完成！';
+                await new Promise(r => setTimeout(r, 180));
+            };
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: question
+                            }
+                        ]
+                    })
+                });
+                
+                const data = await response.json();
+                await finishProgress();
+                
+                if (data.success) {
+                    const aiResponse = data.response || '';
+                    const recommendedIds = data.recommended_items || [];
+                    
+                    displayAiResponse(aiResponse, recommendedIds);
+                    
+                    // 清空输入框
+                    document.getElementById('aiQuestionInput').value = '';
+                } else {
+                    responseArea.innerHTML = `<div style="color: #EF4444;">错误: ${data.error || '未知错误'}</div>`;
+                }
+            } catch (error) {
+                clearInterval(_progressInterval);
+                console.error('AI问答失败:', error);
+                responseArea.innerHTML = `<div style="color: #EF4444;">请求失败，请重试</div>`;
+            }
+        }
+
+        async function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) return;
+            
+            if (state.currentEngine === 'ai') {
+                enterAiMode();
+                setTimeout(() => {
+                    document.getElementById('aiQuestionInput').value = query;
+                    handleAiQuestion();
+                }, 100);
+            } else {
+                const url = searchUrls[state.currentEngine] + encodeURIComponent(query);
+                window.open(url, '_blank');
+            }
+        }
+
+        function showAiChatWindow() {
+            document.getElementById('aiChatWindow').classList.add('active');
+            document.getElementById('aiChatMessages').innerHTML = '';
+            state.aiChatContext = [];
+        }
+
+        function hideAiChatWindow() {
+            document.getElementById('aiChatWindow').classList.remove('active');
+        }
+
+        async function sendAiMessage(message) {
+            const messagesContainer = document.getElementById('aiChatMessages');
+            
+            const userMsg = document.createElement('div');
+            userMsg.className = 'ai-message user';
+            userMsg.textContent = message;
+            messagesContainer.appendChild(userMsg);
+            
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'ai-message assistant';
+            loadingMsg.innerHTML = '<div class="loading-spinner"></div>';
+            messagesContainer.appendChild(loadingMsg);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        context: state.aiChatContext
+                    })
+                });
+                
+                const data = await response.json();
+                
+                state.aiChatContext.push({ role: 'user', content: message });
+                state.aiChatContext.push({ role: 'assistant', content: JSON.stringify(data) });
+                
+                loadingMsg.innerHTML = '';
+                
+                if (data.type === 'action') {
+                    if (data.action.type === 'highlight') {
+                        loadingMsg.textContent = data.text || '为您找到了相关资源';
+                        highlightItems(data.action.ids);
+                    } else if (data.action.type === 'open_category') {
+                        loadingMsg.textContent = data.text || '正在打开分类...';
+                        if (data.need_confirm) {
+                            loadingMsg.textContent += ' (输入 y 确认)';
+                        } else {
+                            const category = state.data.categories.find(c => c.name === data.action.target || c.id === data.action.target);
+                            if (category) {
+                                openCategoryModal(category);
+                            }
+                        }
+                    }
+                } else {
+                    loadingMsg.textContent = data.text || '抱歉，没有找到相关资源。';
+                }
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+            } catch (error) {
+                loadingMsg.textContent = '服务暂时不可用，请稍后重试。';
+            }
+        }
+
+        function updateSearchTags() {
+            const settings = loadUserSettings();
+            const tagsContainer = document.getElementById('searchTags');
+            const tags = tagsContainer.querySelectorAll('.search-tag');
+            
+            tags.forEach(tag => {
+                const engine = tag.dataset.engine;
+                if (settings.enabled_engines.includes(engine)) {
+                    tag.style.display = 'inline-block';
+                } else {
+                    tag.style.display = 'none';
+                }
+            });
+        }
+
+        function updateSettingsPanel() {
+            const settings = loadUserSettings();
+            
+            document.getElementById('toggleTagsArea').classList.toggle('active', settings.show_tags_area);
+            document.getElementById('toggleHotkeys').classList.toggle('active', settings.hotkeys_enabled);
+            document.getElementById('toggleBlur').classList.toggle('active', settings.blur_enabled !== false);
+            document.getElementById('toggleCustomMainDisplay').classList.toggle('active', settings.custom_main_display_enabled === true);
+            
+            document.querySelectorAll('#engineCheckboxes input').forEach(checkbox => {
+                checkbox.checked = settings.enabled_engines.includes(checkbox.value);
+            });
+        }
+
+        function applyWallpaper(url) {
+            if (url) {
+                document.body.style.backgroundImage = `url(${url})`;
+                document.body.style.backgroundColor = '';
+            } else {
+                document.body.style.backgroundImage = '';
+            }
+            
+            // 如果启用了模糊效果，同时更新blur overlay
+            const blurOverlay = document.getElementById('blurOverlay');
+            if (blurOverlay && blurOverlay.style.display !== 'none') {
+                if (url) {
+                    blurOverlay.style.backgroundImage = `url(${url})`;
+                    blurOverlay.style.backgroundColor = '';
+                } else {
+                    blurOverlay.style.backgroundImage = '';
+                }
+            }
+        }
+
+        function applyBackgroundColor(color) {
+            if (color) {
+                document.body.style.backgroundImage = '';
+                document.body.style.backgroundColor = color;
+            }
+            
+            // 如果启用了模糊效果，同时更新blur overlay
+            const blurOverlay = document.getElementById('blurOverlay');
+            if (blurOverlay && blurOverlay.style.display !== 'none') {
+                if (color) {
+                    blurOverlay.style.backgroundImage = '';
+                    blurOverlay.style.backgroundColor = color;
+                } else {
+                    blurOverlay.style.backgroundColor = '';
+                }
+            }
+        }
+
+        // AI 问答模式相关函数
+        function enterAiMode() {
+            state.aiModeActive = true;
+            
+            // 隐藏标题和搜索框，为AI问答框腾位置
+            document.getElementById('mainTitle').style.display = 'none';
+            document.getElementById('searchBoxContainer').style.display = 'none';
+            
+            // 显示AI问答区域
+            document.getElementById('aiQuestionMode').style.display = 'flex';
+            
+            // 聚焦AI问题输入框
+            document.getElementById('aiQuestionInput').focus();
+            
+            // 初始化分割线拖拽
+            initSplitterDrag();
+        }
+
+        function exitAiMode() {
+            state.aiModeActive = false;
+            
+            // 显示标题和搜索框
+            document.getElementById('mainTitle').style.display = 'block';
+            document.getElementById('searchBoxContainer').style.display = 'block';
+            
+            // 隐藏AI问答区域
+            document.getElementById('aiQuestionMode').style.display = 'none';
+            
+            // 清空AI内容
+            document.getElementById('aiResponseArea').innerHTML = '<div style="color: #9CA3AF; text-align: center;">等待提问...</div>';
+            document.getElementById('aiRecommendedItems').innerHTML = '';
+            document.getElementById('aiQuestionInput').value = '';
+            const hint = document.getElementById('aiInputHint');
+            if (hint) hint.style.display = 'none';
+            state.aiRecommendedItems = [];
+        }
+
+        function initSplitterDrag() {
+            const splitter = document.getElementById('aiSplitter');
+            const responseArea = document.getElementById('aiResponseArea');
+            const recommendedArea = document.getElementById('aiRecommendedArea');
+            const container = document.getElementById('aiQuestionMode');
+            
+            let isResizing = false;
+            let startX = 0;
+            let startWidth = 0;
+
+            splitter.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startWidth = responseArea.offsetWidth;
+                splitter.classList.add('dragging');
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                const diff = e.clientX - startX;
+                const newWidth = startWidth + diff;
+                const containerWidth = container.offsetWidth;
+                const minWidth = 200;
+                const recommendedMinWidth = 120;
+                
+                if (newWidth > minWidth && containerWidth - newWidth > recommendedMinWidth) {
+                    responseArea.style.flex = `0 0 ${newWidth}px`;
+                    recommendedArea.style.width = (containerWidth - newWidth - 4) + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                splitter.classList.remove('dragging');
+            });
+        }
+
+        function displayAiResponse(response, recommendedItemIds = []) {
+            const responseArea = document.getElementById('aiResponseArea');
+            const recommendedArea = document.getElementById('aiRecommendedItems');
+            
+            // 显示AI回复
+            responseArea.innerHTML = `<div class="ai-response-text">${escapeHtml(response)}</div>`;
+            
+            // 保存推荐项目到 state，供数字访问使用
+            state.aiRecommendedItems = [];
+            const metaList = []; // 用于构建汇总表格
+            
+            // 显示推荐网页（右侧图标栏）
+            recommendedArea.innerHTML = '';
+            recommendedItemIds.forEach((itemId, index) => {
+                const meta = findItemWithMeta(itemId);
+                if (meta) {
+                    const { item, categoryName, subcategoryName } = meta;
+                    state.aiRecommendedItems.push(item);
+                    metaList.push({ item, categoryName, subcategoryName, inMain: isItemInMainArea(itemId) });
+                    const num = state.aiRecommendedItems.length; // 1-based
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'ai-recommended-item';
+                    itemDiv.dataset.index = index;
+                    itemDiv.dataset.id = itemId;
+                    itemDiv.title = item.name + (item.description ? '\n' + item.description : '');
+                    
+                    // 数字徽章
+                    const badge = document.createElement('div');
+                    badge.className = 'ai-recommended-badge';
+                    badge.textContent = num;
+                    itemDiv.appendChild(badge);
+                    
+                    // 图标
+                    const iconDiv = createIconElement(item);
+                    iconDiv.className = 'ai-recommended-item-icon';
+                    itemDiv.appendChild(iconDiv);
+                    
+                    // 名称
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'ai-recommended-item-name';
+                    nameDiv.textContent = item.name;
+                    itemDiv.appendChild(nameDiv);
+                    
+                    // 检查是否在主界面显示 → 红色高亮
+                    if (isItemInMainArea(itemId)) {
+                        itemDiv.classList.add('highlighted-from-ai');
+                    }
+                    
+                    itemDiv.addEventListener('click', () => window.open(item.url, '_blank'));
+                    itemDiv.addEventListener('contextmenu', (e) => showContextMenu(e, item, true, false));
+                    
+                    recommendedArea.appendChild(itemDiv);
+                }
+            });
+
+            // 汇总表格（在回复文字下方）
+            if (metaList.length > 0) {
+                const table = document.createElement('table');
+                table.className = 'ai-summary-table';
+                table.innerHTML = `<thead><tr>
+                    <th class="st-num">#</th>
+                    <th>名称</th>
+                    <th>分类</th>
+                    <th>简介</th>
+                </tr></thead>`;
+                const tbody = document.createElement('tbody');
+                metaList.forEach(({ item, categoryName, subcategoryName, inMain }, i) => {
+                    const tr = document.createElement('tr');
+                    tr.title = '点击访问 ' + item.name;
+                    tr.addEventListener('click', () => window.open(item.url, '_blank'));
+                    tr.innerHTML = `
+                        <td class="st-num ${inMain ? 'in-main' : ''}">${i + 1}</td>
+                        <td class="st-name">${escapeHtml(item.name)}${inMain ? ' <span style="color:#EF4444;font-size:10px;">[主区]</span>' : ''}</td>
+                        <td class="st-cat">${escapeHtml(categoryName)} › ${escapeHtml(subcategoryName)}</td>
+                        <td class="st-desc">${escapeHtml(item.description || '—')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                responseArea.appendChild(table);
+            }
+            
+            // 有推荐结果时显示操作提示
+            const hint = document.getElementById('aiInputHint');
+            if (hint) hint.style.display = state.aiRecommendedItems.length > 0 ? 'block' : 'none';
+        }
+
+        function findItemById(itemId) {
+            if (!state.data || !state.data.categories) return null;
+            
+            for (let category of state.data.categories) {
+                for (let subcategory of category.subcategories) {
+                    const item = subcategory.items.find(i => i.id === itemId);
+                    if (item) return item;
+                }
+            }
+            return null;
+        }
+
+        function findItemWithMeta(itemId) {
+            if (!state.data || !state.data.categories) return null;
+            for (let category of state.data.categories) {
+                for (let subcategory of category.subcategories) {
+                    const item = subcategory.items.find(i => i.id === itemId);
+                    if (item) return { item, categoryName: category.name, subcategoryName: subcategory.name };
+                }
+            }
+            return null;
+        }
+
+        function isItemInMainArea(itemId) {
+            // 仅判断是否真实出现在当前首页展示区
+            return state.mainVisibleItemIds.includes(itemId);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function applyBlurEffect(enabled) {
+            let blurOverlay = document.getElementById('blurOverlay');
+            
+            if (enabled) {
+                if (!blurOverlay) {
+                    blurOverlay = document.createElement('div');
+                    blurOverlay.id = 'blurOverlay';
+                    blurOverlay.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-size: cover;
+                        background-position: center;
+                        background-attachment: fixed;
+                        -webkit-filter: blur(8px);
+                        filter: blur(8px);
+                        z-index: -1;
+                        pointer-events: none;
+                    `;
+                    document.body.insertBefore(blurOverlay, document.body.firstChild);
+                }
+                
+                // 从body复制背景到blurOverlay
+                const bgImage = window.getComputedStyle(document.body).backgroundImage;
+                const bgColor = window.getComputedStyle(document.body).backgroundColor;
+                blurOverlay.style.backgroundImage = bgImage;
+                blurOverlay.style.backgroundColor = bgColor;
+                blurOverlay.style.display = 'block';
+                
+                // 隐藏body的背景，因为blur overlay来显示模糊的背景
+                document.body.style.backgroundColor = 'transparent';
+                document.body.style.backgroundImage = 'none';
+            } else {
+                if (blurOverlay) {
+                    blurOverlay.style.display = 'none';
+                }
+                
+                // 恢复body背景
+                const settings = loadUserSettings();
+                if (settings.background_color) {
+                    document.body.style.backgroundColor = settings.background_color;
+                } else {
+                    document.body.style.backgroundColor = '';
+                }
+                
+                if (settings.wallpaper_url) {
+                    document.body.style.backgroundImage = `url('${settings.wallpaper_url}')`;
+                } else {
+                    document.body.style.backgroundImage = '';
+                }
+            }
+        }
+
+        async function uploadWallpaper(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/api/wallpaper/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const settings = loadUserSettings();
+                    settings.wallpaper_url = data.url;
+                    settings.background_color = '';
+                    saveUserSettings(settings);
+                    applyWallpaper(data.url);
+                    loadWallpaperGallery();
+                } else {
+                    alert('上传失败：' + data.error);
+                }
+            } catch (error) {
+                alert('上传失败，请重试');
+            }
+        }
+
+        async function generateWallpaper() {
+            const modal = document.getElementById('generateWallpaperModal');
+            // 重置状态
+            document.getElementById('wallpaperGenPreview').style.display = 'none';
+            document.getElementById('wallpaperGenStatus').style.display = 'none';
+            document.getElementById('wallpaperGenApply').style.display = 'none';
+            document.getElementById('wallpaperGenSubmit').style.display = '';
+            document.getElementById('wallpaperPromptInput').value = '';
+            document.querySelectorAll('.wallpaper-style-btn').forEach(b => {
+                b.style.background = 'white'; b.style.color = '#374151'; b.style.borderColor = '#E5E7EB';
+            });
+            const firstBtn = document.querySelector('.wallpaper-style-btn[data-style="anime"]');
+            if (firstBtn) { firstBtn.style.background = '#6366F1'; firstBtn.style.color = 'white'; firstBtn.style.borderColor = '#6366F1'; }
+            modal.style.display = 'flex';
+        }
+
+        async function loadWallpaperGallery() {
+            try {
+                const response = await fetch('/api/wallpaper/list');
+                const data = await response.json();
+                
+                const gallery = document.getElementById('wallpaperGallery');
+                gallery.innerHTML = '';
+                
+                if (data.success && data.wallpapers && data.wallpapers.length > 0) {
+                    data.wallpapers.forEach(wallpaper => {
+                        const item = document.createElement('div');
+                        item.style.cssText = 'position: relative; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid #E5E7EB; transition: all 0.15s ease;';
+                        
+                        const img = document.createElement('img');
+                        img.src = wallpaper.url;
+                        img.style.cssText = 'width: 100%; height: 80px; object-fit: cover;';
+                        item.appendChild(img);
+                        
+                        const overlay = document.createElement('div');
+                        overlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.15s ease;';
+                        item.appendChild(overlay);
+                        
+                        item.addEventListener('mouseenter', function() {
+                            overlay.style.opacity = '1';
+                            this.style.borderColor = '#4F46E5';
+                        });
+                        
+                        item.addEventListener('mouseleave', function() {
+                            overlay.style.opacity = '0';
+                            this.style.borderColor = '#E5E7EB';
+                        });
+                        
+                        item.addEventListener('click', () => {
+                            const settings = loadUserSettings();
+                            settings.wallpaper_url = wallpaper.url;
+                            settings.background_color = '';
+                            saveUserSettings(settings);
+                            applyWallpaper(wallpaper.url);
+                        });
+                        
+                        gallery.appendChild(item);
+                    });
+                } else {
+                    gallery.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 16px; color: #9CA3AF; font-size: 12px;">还没有上传过壁纸</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load wallpaper gallery:', error);
+                const gallery = document.getElementById('wallpaperGallery');
+                gallery.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 16px; color: #9CA3AF; font-size: 12px;">加载失败</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('=== DOMContentLoaded 开始 ===');
+            
+            try {
+                const response = await fetch('/api/data');
+                state.data = await response.json();
+                console.log('数据加载成功:', state.data);
+            } catch (error) {
+                console.error('Failed to load data:', error);
+            }
+            
+            const settings = loadUserSettings();
+            applyWallpaper(settings.wallpaper_url);
+            
+            if (settings.background_color) {
+                applyBackgroundColor(settings.background_color);
+                document.getElementById('customColor').value = settings.background_color;
+            }
+            
+            applyBlurEffect(settings.blur_enabled);
+            
+            updateSearchTags();
+            updateSettingsPanel();
+            renderCategories();
+            renderDock();
+            loadWallpaperGallery();
+            
+            // 确保关键元素可见
+            document.getElementById('mainTitle').style.display = 'block';
+            document.getElementById('searchBoxContainer').style.display = 'block';
+            document.getElementById('categoriesContainer').style.display = 'block';
+            document.getElementById('dockContainer').style.display = 'flex';
+            document.getElementById('aiQuestionMode').style.display = 'none';
+            
+            console.log('关键元素显示状态已设置');
+            
+            // 绑定搜索标签点击事件
+            const searchTagsContainer = document.getElementById('searchTags');
+            console.log('搜索标签容器:', searchTagsContainer);
+            
+            const tags = searchTagsContainer.querySelectorAll('.search-tag');
+            console.log('找到的标签数量:', tags.length);
+            
+            tags.forEach(tag => {
+                console.log('绑定标签事件:', tag.dataset.engine, tag.textContent);
+                tag.addEventListener('click', function(e) {
+                    console.log('标签被点击:', this.dataset.engine);
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.search-tag').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    state.currentEngine = this.dataset.engine;
+                    
+                    if (state.currentEngine === 'ai') {
+                        console.log('进入AI模式');
+                        enterAiMode();
+                    } else {
+                        console.log('退出AI模式');
+                        clearHighlights();
+                        exitAiMode();
+                    }
+                });
+            });
+            
+            console.log('=== DOMContentLoaded 完成 ===');
+            
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+            
+            // AI 问答输入框处理
+            document.getElementById('aiQuestionInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const val = document.getElementById('aiQuestionInput').value.trim();
+                    const num = parseInt(val, 10);
+                    // 如果输入是纯数字且在推荐列表范围内，直接打开对应网站
+                    if (!isNaN(num) && num >= 1 && state.aiRecommendedItems && num <= state.aiRecommendedItems.length) {
+                        window.open(state.aiRecommendedItems[num - 1].url, '_blank');
+                        document.getElementById('aiQuestionInput').value = '';
+                        return;
+                    }
+                    handleAiQuestion();
+                }
+            });
+            
+            // 退出AI模式按钮
+            document.getElementById('exitAiMode').addEventListener('click', () => {
+                exitAiMode();
+                // 恢复激活的搜索引擎标签
+                document.querySelectorAll('#searchTags .search-tag').forEach(t => t.classList.remove('active'));
+                document.querySelector('#searchTags .search-tag[data-engine="baidu"]').classList.add('active');
+                state.currentEngine = 'baidu';
+            });
+            
+            document.getElementById('modalClose').addEventListener('click', () => {
+                document.getElementById('categoryModal').classList.remove('active');
+            });
+            
+            document.getElementById('categoryModal').addEventListener('click', (e) => {
+                if (e.target.id === 'categoryModal') {
+                    document.getElementById('categoryModal').classList.remove('active');
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.context-menu') && !e.target.closest('.item-card') && !e.target.closest('.dock-item')) {
+                    hideContextMenu();
+                }
+            });
+            
+            document.querySelectorAll('.context-menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const action = item.dataset.action;
+                    const target = state.contextMenuTarget;
+                    
+                    if (action === 'addToDock') {
+                        addItemToDock(target);
+                    } else if (action === 'addToCategory') {
+                        if (state.contextMenuIsInModal) {
+                            // 在模态框内，直接添加到当前分类
+                            addItemToCurrentCategory(target);
+                        } else {
+                            // 不在模态框内，弹窗选择分类
+                            showCategorySelectModal(target);
+                        }
+                    } else if (action === 'addToFavorites') {
+                        addItemToFavorites(target);
+                    } else if (action === 'delete') {
+                        showConfirmDialog(target.name);
+                    }
+                    
+                    hideContextMenu();
+                });
+            });
+            
+            document.getElementById('categorySelectCancel').addEventListener('click', () => {
+                document.getElementById('categorySelectModal').style.display = 'none';
+            });
+            
+            document.getElementById('confirmCancel').addEventListener('click', hideConfirmDialog);
+            document.getElementById('confirmDelete').addEventListener('click', () => {
+                if (state.contextMenuTarget) {
+                    deleteItem(state.contextMenuTarget);
+                }
+            });
+            
+            document.getElementById('gearIcon').addEventListener('click', () => {
+                document.getElementById('settingsPanel').classList.toggle('active');
+            });
+            
+            // 点击设置面板外关闭
+            document.addEventListener('click', (e) => {
+                const settingsPanel = document.getElementById('settingsPanel');
+                const gearIcon = document.getElementById('gearIcon');
+                
+                if (settingsPanel.classList.contains('active') && 
+                    !e.target.closest('#settingsPanel') && 
+                    !e.target.closest('#gearIcon')) {
+                    settingsPanel.classList.remove('active');
+                }
+            });
+            
+            document.getElementById('toggleTagsArea').addEventListener('click', function() {
+                this.classList.toggle('active');
+                const settings = loadUserSettings();
+                settings.show_tags_area = this.classList.contains('active');
+                saveUserSettings(settings);
+                renderCategories();
+            });
+
+            document.getElementById('toggleCustomMainDisplay').addEventListener('click', function() {
+                this.classList.toggle('active');
+                const settings = loadUserSettings();
+                settings.custom_main_display_enabled = this.classList.contains('active');
+                saveUserSettings(settings);
+                renderCategories();
+            });
+
+            document.getElementById('configMainDisplayBtn').addEventListener('click', openMainDisplayConfigModal);
+            document.getElementById('mainDisplayConfigCancel').addEventListener('click', () => {
+                document.getElementById('mainDisplayConfigModal').style.display = 'none';
+            });
+            document.getElementById('mainDisplayConfigSave').addEventListener('click', saveMainDisplayConfig);
+            document.getElementById('mainDisplayConfigModal').addEventListener('click', (e) => {
+                if (e.target.id === 'mainDisplayConfigModal') {
+                    document.getElementById('mainDisplayConfigModal').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('toggleHotkeys').addEventListener('click', function() {
+                this.classList.toggle('active');
+                const settings = loadUserSettings();
+                settings.hotkeys_enabled = this.classList.contains('active');
+                saveUserSettings(settings);
+            });
+            
+            document.querySelectorAll('.color-preset').forEach(item => {
+                item.addEventListener('click', function() {
+                    const color = this.dataset.color;
+                    const settings = loadUserSettings();
+                    settings.background_color = color;
+                    settings.wallpaper_url = '';
+                    saveUserSettings(settings);
+                    applyBackgroundColor(color);
+                    document.getElementById('customColor').value = color;
+                });
+            });
+            
+            document.getElementById('customColor').addEventListener('change', function() {
+                const color = this.value;
+                const settings = loadUserSettings();
+                settings.background_color = color;
+                settings.wallpaper_url = '';
+                saveUserSettings(settings);
+                applyBackgroundColor(color);
+            });
+            
+            document.getElementById('toggleBlur').addEventListener('click', function() {
+                this.classList.toggle('active');
+                const settings = loadUserSettings();
+                settings.blur_enabled = this.classList.contains('active');
+                saveUserSettings(settings);
+                applyBlurEffect(settings.blur_enabled);
+            });
+            
+            document.querySelectorAll('#engineCheckboxes input').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    const settings = loadUserSettings();
+                    settings.enabled_engines = Array.from(document.querySelectorAll('#engineCheckboxes input:checked')).map(c => c.value);
+                    saveUserSettings(settings);
+                    updateSearchTags();
+                });
+            });
+            
+            document.getElementById('uploadWallpaperBtn').addEventListener('click', () => {
+                document.getElementById('wallpaperInput').click();
+            });
+            
+            document.getElementById('wallpaperInput').addEventListener('change', (e) => {
+                if (e.target.files[0]) {
+                    uploadWallpaper(e.target.files[0]);
+                }
+            });
+            
+            document.getElementById('generateWallpaperBtn').addEventListener('click', generateWallpaper);
+
+            // AI 生成壁纸弹窗逻辑
+            document.querySelectorAll('.wallpaper-style-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.wallpaper-style-btn').forEach(b => {
+                        b.style.background = 'white'; b.style.color = '#374151'; b.style.borderColor = '#E5E7EB';
+                    });
+                    this.style.background = '#6366F1'; this.style.color = 'white'; this.style.borderColor = '#6366F1';
+                });
+            });
+
+            document.getElementById('wallpaperGenCancel').addEventListener('click', () => {
+                document.getElementById('generateWallpaperModal').style.display = 'none';
+            });
+
+            document.getElementById('generateWallpaperModal').addEventListener('click', (e) => {
+                if (e.target.id === 'generateWallpaperModal') {
+                    document.getElementById('generateWallpaperModal').style.display = 'none';
+                }
+            });
+
+            let _lastGeneratedUrl = '';
+
+            document.getElementById('wallpaperGenSubmit').addEventListener('click', async () => {
+                const activeBtn = document.querySelector('.wallpaper-style-btn[style*="6366F1"]');
+                const style = activeBtn ? activeBtn.dataset.style : 'anime';
+                const userPrompt = document.getElementById('wallpaperPromptInput').value.trim();
+
+                document.getElementById('wallpaperGenStatus').style.display = 'block';
+                document.getElementById('wallpaperGenSubmit').disabled = true;
+                document.getElementById('wallpaperGenPreview').style.display = 'none';
+                document.getElementById('wallpaperGenApply').style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/wallpaper/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: userPrompt, style })
+                    });
+                    const data = await response.json();
+                    document.getElementById('wallpaperGenStatus').style.display = 'none';
+                    document.getElementById('wallpaperGenSubmit').disabled = false;
+
+                    if (data.success) {
+                        _lastGeneratedUrl = data.url;
+                        document.getElementById('wallpaperGenPreviewImg').src = data.url;
+                        document.getElementById('wallpaperGenPreview').style.display = 'block';
+                        document.getElementById('wallpaperGenApply').style.display = '';
+                    } else {
+                        alert('生成失败：' + (data.error || '未知错误'));
+                    }
+                } catch (err) {
+                    document.getElementById('wallpaperGenStatus').style.display = 'none';
+                    document.getElementById('wallpaperGenSubmit').disabled = false;
+                    alert('生成失败，请重试');
+                }
+            });
+
+            document.getElementById('wallpaperGenApply').addEventListener('click', () => {
+                if (!_lastGeneratedUrl) return;
+                const settings = loadUserSettings();
+                settings.wallpaper_url = _lastGeneratedUrl;
+                settings.background_color = '';
+                saveUserSettings(settings);
+                applyWallpaper(_lastGeneratedUrl);
+                loadWallpaperGallery();
+                document.getElementById('generateWallpaperModal').style.display = 'none';
+            });
+            
+            document.getElementById('aiChatClose').addEventListener('click', hideAiChatWindow);
+            
+            document.getElementById('aiChatSend').addEventListener('click', () => {
+                const input = document.getElementById('aiChatInput');
+                if (input.value.trim()) {
+                    sendAiMessage(input.value.trim());
+                    input.value = '';
+                }
+            });
+            
+            document.getElementById('aiChatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    document.getElementById('aiChatSend').click();
+                }
+            });
+            
+            document.getElementById('addLinkCancel').addEventListener('click', hideAddLinkPopup);
+            document.getElementById('addLinkConfirm').addEventListener('click', handleAddLink);
+            
+            document.getElementById('linkUrl').addEventListener('blur', async function() {
+                if (this.value && !document.getElementById('linkName').value) {
+                    const title = await fetchTitle(this.value);
+                    if (title) {
+                        document.getElementById('linkName').value = title;
+                    }
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                const settings = loadUserSettings();
+                
+                // 处理数字快捷键 (1-9, 0)
+                if (!settings.hotkeys_enabled) {
+                    // 快捷键已禁用，跳过所有快捷键处理
+                } else if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                    // 在输入框中不处理快捷键（除了特殊情况）
+                } else {
+                    const dock = loadUserDock();
+                    const keyNum = parseInt(e.key);
+                    
+                    // 数字快捷键 1-9 对应 dock index 0-8，0 对应 index 9
+                    if ((keyNum >= 1 && keyNum <= 9) || e.key === '0') {
+                        const index = e.key === '0' ? 9 : (keyNum - 1);
+                        if (dock[index]) {
+                            e.preventDefault();
+                            window.open(dock[index].url, '_blank');
+                            return;
+                        }
+                    }
+                }
+                
+                // 处理 / 键：进入AI问答模式（仅在启用快捷键时有效）
+                if (settings.hotkeys_enabled && e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    // 设置AI引擎为当前引擎
+                    state.currentEngine = 'ai';
+                    // 更新搜索标签的激活状态
+                    document.querySelectorAll('.search-tag').forEach(t => t.classList.remove('active'));
+                    document.querySelector('.search-tag[data-engine="ai"]').classList.add('active');
+                    // 进入AI模式
+                    enterAiMode();
+                    return;
+                }
+                
+                // 处理回车键：在删除确认对话框中按回车确认删除
+                if (e.key === 'Enter') {
+                    const confirmDialog = document.getElementById('confirmDialog');
+                    if (confirmDialog && confirmDialog.classList.contains('active')) {
+                        e.preventDefault();
+                        document.getElementById('confirmDelete').click();
+                        return;
+                    }
+                }
+                
+                // Escape 键关闭各种窗口
+                if (e.key === 'Escape') {
+                    document.getElementById('categoryModal').classList.remove('active');
+                    document.getElementById('settingsPanel').classList.remove('active');
+                    hideAiChatWindow();
+                    hideAddLinkPopup();
+                    hideConfirmDialog();
+                    hideContextMenu();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

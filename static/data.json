@@ -1,0 +1,736 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2024-01-15",
+  "categories": [
+    {
+      "id": "campus-services",
+      "name": "校园服务",
+      "icon": "fa-school",
+      "description": "校园生活相关服务",
+      "subcategories": [
+        {
+          "id": "campus-admin",
+          "name": "教务服务",
+          "items": [
+            {
+              "id": "sspu-official",
+              "name": "学校官网",
+              "url": "https://www.sspu.edu.cn/",
+              "description": "上海第二工业大学官方网站",
+              "keywords": ["官网", "学校", "首页", "上海第二工业大学"],
+              "icon": null
+            },
+            {
+              "id": "sspu-oa",
+              "name": "OA办公",
+              "url": "https://oa.sspu.edu.cn/",
+              "description": "学校 OA 办公系统",
+              "keywords": ["OA", "办公", "审批", "校园"],
+              "icon": null
+            },
+            {
+              "id": "sspu-college-sites",
+              "name": "学院网站",
+              "url": "https://www.sspu.edu.cn/2945/list.htm",
+              "description": "学校各学院官网导航",
+              "keywords": ["学院", "官网", "院系", "学校"],
+              "icon": null
+            },
+            {
+              "id": "sspu-software",
+              "name": "校版软件",
+              "url": "https://zbsoftware.sspu.edu.cn/",
+              "description": "校园网内正版软件服务",
+              "keywords": ["正版软件", "校园网", "软件", "下载"],
+              "icon": null
+            },
+            {
+              "id": "sspu-jwc",
+              "name": "教务处",
+              "url": "https://jwc.sspu.edu.cn/",
+              "description": "学校教务处官网",
+              "keywords": ["教务处", "课程", "成绩", "选课", "考试"],
+              "icon": null
+            },
+            {
+              "id": "sspu-news",
+              "name": "新闻网",
+              "url": "https://xww.sspu.edu.cn/",
+              "description": "学校官方新闻网",
+              "keywords": ["新闻", "校园", "公告", "动态"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "campus-life",
+          "name": "生活服务",
+          "items": [
+            {
+              "id": "sspu-library-use",
+              "name": "图书馆服务",
+              "url": "https://libraryuse.sspu.edu.cn/",
+              "description": "图书馆资源与借阅服务",
+              "keywords": ["图书馆", "借阅", "资源", "学习"],
+              "icon": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "learning-platforms",
+      "name": "学习平台",
+      "icon": "fa-book",
+      "description": "在线学习与课程平台",
+      "subcategories": [
+        {
+          "id": "online-courses",
+          "name": "在线课程",
+          "items": [
+            {
+              "id": "mooc",
+              "name": "中国大学MOOC",
+              "url": "https://www.icourse163.org",
+              "description": "国家级在线课程平台",
+              "keywords": ["MOOC", "慕课", "在线课程", "学习"],
+              "icon": null
+            },
+            {
+              "id": "xuexitong",
+              "name": "学习通",
+              "url": "https://i.chaoxing.com",
+              "description": "超星学习平台",
+              "keywords": ["学习通", "超星", "网课", "作业"],
+              "icon": null
+            },
+            {
+              "id": "zhihuishu",
+              "name": "智慧树",
+              "url": "https://www.zhihuishu.com",
+              "description": "知到网课平台",
+              "keywords": ["智慧树", "知到", "网课"],
+              "icon": null
+            },
+            {
+              "id": "bilibili",
+              "name": "哔哩哔哩",
+              "url": "https://www.bilibili.com",
+              "description": "视频学习资源",
+              "keywords": ["B站", "视频", "学习", "教程"],
+              "icon": null
+            },
+            {
+              "id": "xuexi",
+              "name": "学习强国",
+              "url": "https://www.xuexi.cn",
+              "description": "人民日报主办综合学习平台",
+              "keywords": ["学习强国", "学习", "新闻", "党政"],
+              "icon": null
+            },
+            {
+              "id": "smartedu",
+              "name": "智慧高教",
+              "url": "https://higher.smartedu.cn",
+              "description": "教育部高等教育智慧平台",
+              "keywords": ["智慧高教", "高校", "课程", "教育部"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "language-learning",
+          "name": "语言学习",
+          "items": [
+            {
+              "id": "duolingo",
+              "name": "多邻国",
+              "url": "https://www.duolingo.cn",
+              "description": "免费语言学习平台",
+              "keywords": ["英语", "语言", "学习", "多邻国"],
+              "icon": null
+            },
+            {
+              "id": "baicizhan",
+              "name": "百词斩",
+              "url": "https://www.baicizhan.com",
+              "description": "英语单词学习",
+              "keywords": ["英语", "单词", "背单词", "百词斩"],
+              "icon": null
+            },
+            {
+              "id": "shanbay",
+              "name": "扇贝单词",
+              "url": "https://www.shanbay.com",
+              "description": "英语学习平台",
+              "keywords": ["扇贝", "英语", "单词"],
+              "icon": null
+            },
+            {
+              "id": "welearn",
+              "name": "WeLearn",
+              "url": "https://welearn.sflep.com/index.aspx",
+              "description": "外教社网络学习平台",
+              "keywords": ["WeLearn", "英语", "外教社", "学习"],
+              "icon": null
+            },
+            {
+              "id": "iwrite",
+              "name": "iWrite",
+              "url": "https://iwrite.unipus.cn/",
+              "description": "外研社英语写作训练平台",
+              "keywords": ["iWrite", "英语写作", "外研社", "写作"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "algo-ctf",
+          "name": "算法竞赛/CTF",
+          "items": [
+            {
+              "id": "nowcoder-contest",
+              "name": "牛客竞赛",
+              "url": "https://ac.nowcoder.com/acm/contest/vip-index",
+              "description": "牛客算法与编程竞赛平台",
+              "keywords": ["牛客", "竞赛", "算法", "编程"],
+              "icon": null
+            },
+            {
+              "id": "abc",
+              "name": "ABC",
+              "url": "https://atcoder.jp",
+              "description": "AtCoder Beginner Contest",
+              "keywords": ["ABC", "AtCoder", "算法", "竞赛"],
+              "icon": null
+            },
+            {
+              "id": "codeforces",
+              "name": "Codeforces",
+              "url": "https://codeforces.com",
+              "description": "国际算法竞赛平台",
+              "keywords": ["Codeforces", "算法", "竞赛", "OJ"],
+              "icon": null
+            },
+            {
+              "id": "leetcode-cn",
+              "name": "力扣",
+              "url": "https://leetcode.cn",
+              "description": "LeetCode 中文算法练习",
+              "keywords": ["LeetCode", "力扣", "算法", "刷题"],
+              "icon": null
+            },
+            {
+              "id": "luogu",
+              "name": "洛谷",
+              "url": "https://www.luogu.com.cn",
+              "description": "中文算法题库与竞赛平台",
+              "keywords": ["洛谷", "算法", "竞赛", "题库"],
+              "icon": null
+            },
+            {
+              "id": "bugku-ctf",
+              "name": "BugKu CTF",
+              "url": "https://ctf.bugku.com/game/index.html",
+              "description": "CTF 安全实战训练平台",
+              "keywords": ["CTF", "BugKu", "安全", "攻防"],
+              "icon": null
+            },
+            {
+              "id": "pintia",
+              "name": "PTA",
+              "url": "https://pintia.cn/home",
+              "description": "程序设计类实验辅助教学平台",
+              "keywords": ["PTA", "编程", "题库", "算法", "刷题"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "video-media",
+          "name": "视频媒体",
+          "items": [
+            {
+              "id": "cctv",
+              "name": "CCTV直播",
+              "url": "https://tv.cctv.com",
+              "description": "中央电视台官方视频与直播",
+              "keywords": ["CCTV", "央视", "新闻", "直播", "电视"],
+              "icon": null
+            },
+            {
+              "id": "iqiyi",
+              "name": "爱奇艺",
+              "url": "https://www.iqiyi.com",
+              "description": "爱奇艺视频平台",
+              "keywords": ["爱奇艺", "视频", "影视", "综艺"],
+              "icon": null
+            },
+            {
+              "id": "youku",
+              "name": "优酷",
+              "url": "https://www.youku.com/ku/webhome",
+              "description": "优酷视频平台",
+              "keywords": ["优酷", "视频", "影视", "综艺"],
+              "icon": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "academic-resources",
+      "name": "学术资源",
+      "icon": "fa-graduation-cap",
+      "description": "论文、文献与研究资源",
+      "subcategories": [
+        {
+          "id": "paper-databases",
+          "name": "论文数据库",
+          "items": [
+            {
+              "id": "cnki",
+              "name": "中国知网",
+              "url": "https://www.cnki.net",
+              "description": "中文学术文献数据库",
+              "keywords": ["知网", "论文", "文献", "学术", "CNKI"],
+              "icon": null
+            },
+            {
+              "id": "wanfang",
+              "name": "万方数据",
+              "url": "https://www.wanfangdata.com.cn",
+              "description": "学术文献数据库",
+              "keywords": ["万方", "论文", "文献"],
+              "icon": null
+            },
+            {
+              "id": "google-scholar",
+              "name": "Google Scholar",
+              "url": "https://scholar.google.com",
+              "description": "谷歌学术搜索",
+              "keywords": ["谷歌学术", "论文", "学术", "Scholar"],
+              "icon": null
+            },
+            {
+              "id": "arxiv",
+              "name": "arXiv",
+              "url": "https://arxiv.org",
+              "description": "预印本论文库",
+              "keywords": ["arXiv", "论文", "预印本", "科研"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "academic-ai",
+          "name": "学术AI",
+          "items": [
+            {
+              "id": "perplexity",
+              "name": "Perplexity",
+              "url": "https://www.perplexity.ai",
+              "description": "AI学术搜索引擎，自动引用文献",
+              "keywords": ["Perplexity", "AI", "搜索", "学术", "文献"],
+              "icon": null
+            },
+            {
+              "id": "consensus",
+              "name": "Consensus",
+              "url": "https://consensus.app",
+              "description": "AI学术论文搜索与摘要",
+              "keywords": ["Consensus", "AI", "论文", "摘要"],
+              "icon": null
+            },
+            {
+              "id": "elicit",
+              "name": "Elicit",
+              "url": "https://elicit.com",
+              "description": "AI辅助文献综述与研究",
+              "keywords": ["Elicit", "AI", "文献综述", "研究"],
+              "icon": null
+            },
+            {
+              "id": "research-rabbit",
+              "name": "ResearchRabbit",
+              "url": "https://www.researchrabbit.ai",
+              "description": "AI论文推荐与知识图谱",
+              "keywords": ["ResearchRabbit", "论文", "AI", "文献"],
+              "icon": null
+            },
+            {
+              "id": "scispace",
+              "name": "SciSpace",
+              "url": "https://typeset.io",
+              "description": "AI读论文、解释概念",
+              "keywords": ["SciSpace", "AI", "论文", "阅读"],
+              "icon": null
+            },
+            {
+              "id": "connected-papers",
+              "name": "Connected Papers",
+              "url": "https://www.connectedpapers.com",
+              "description": "可视化论文关系图谱",
+              "keywords": ["Connected Papers", "论文", "知识图谱", "学术"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "academic-tools",
+          "name": "学术工具",
+          "items": [
+            {
+              "id": "zhihu",
+              "name": "知乎",
+              "url": "https://www.zhihu.com",
+              "description": "知识问答社区",
+              "keywords": ["知乎", "问答", "知识", "经验"],
+              "icon": null
+            },
+            {
+              "id": "deepl",
+              "name": "DeepL",
+              "url": "https://www.deepl.com",
+              "description": "高质量翻译工具",
+              "keywords": ["翻译", "DeepL", "英文"],
+              "icon": null
+            },
+            {
+              "id": "grammarly",
+              "name": "Grammarly",
+              "url": "https://www.grammarly.com",
+              "description": "英语写作助手",
+              "keywords": ["写作", "英语", "语法", "Grammarly"],
+              "icon": null
+            },
+            {
+              "id": "overleaf",
+              "name": "Overleaf",
+              "url": "https://www.overleaf.com",
+              "description": "在线 LaTeX 编辑器",
+              "keywords": ["LaTeX", "论文", "排版", "Overleaf"],
+              "icon": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "common-tools",
+      "name": "常用工具",
+      "icon": "fa-tools",
+      "description": "日常实用工具",
+      "subcategories": [
+        {
+          "id": "office-tools",
+          "name": "办公工具",
+          "items": [
+            {
+              "id": "notion",
+              "name": "Notion",
+              "url": "https://www.notion.so",
+              "description": "笔记与协作工具",
+              "keywords": ["笔记", "协作", "Notion", "文档"],
+              "icon": null
+            },
+            {
+              "id": "canva",
+              "name": "Canva",
+              "url": "https://www.canva.com",
+              "description": "在线设计工具",
+              "keywords": ["设计", "海报", "Canva", "图片"],
+              "icon": null
+            },
+            {
+              "id": "wolai",
+              "name": "我来",
+              "url": "https://www.wolai.com",
+              "description": "中文笔记工具",
+              "keywords": ["笔记", "我来", "文档"],
+              "icon": null
+            },
+            {
+              "id": "baidu-naotu",
+              "name": "思维导图",
+              "url": "https://naotu.baidu.com",
+              "description": "百度在线脑图工具",
+              "keywords": ["思维导图", "脑图", "百度", "笔记"],
+              "icon": null
+            },
+            {
+              "id": "youdao-note",
+              "name": "有道云笔记",
+              "url": "https://note.youdao.com",
+              "description": "有道云端笔记与协作",
+              "keywords": ["有道", "云笔记", "笔记", "协作"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "dev-tools",
+          "name": "开发工具",
+          "items": [
+            {
+              "id": "github",
+              "name": "GitHub",
+              "url": "https://github.com",
+              "description": "代码托管平台",
+              "keywords": ["GitHub", "代码", "开源", "Git"],
+              "icon": null
+            },
+            {
+              "id": "stackoverflow",
+              "name": "Stack Overflow",
+              "url": "https://stackoverflow.com",
+              "description": "程序员问答社区",
+              "keywords": ["Stack Overflow", "编程", "问答", "代码"],
+              "icon": null
+            },
+            {
+              "id": "codepen",
+              "name": "CodePen",
+              "url": "https://codepen.io",
+              "description": "前端代码演示",
+              "keywords": ["CodePen", "前端", "代码", "演示"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "general-ai",
+          "name": "通用AI",
+          "items": [
+            {
+              "id": "chatgpt",
+              "name": "ChatGPT",
+              "url": "https://chat.openai.com",
+              "description": "OpenAI 通用对话AI",
+              "keywords": ["ChatGPT", "AI", "对话", "OpenAI"],
+              "icon": null
+            },
+            {
+              "id": "claude",
+              "name": "Claude",
+              "url": "https://claude.ai",
+              "description": "Anthropic AI助手",
+              "keywords": ["Claude", "AI", "对话", "Anthropic"],
+              "icon": null
+            },
+            {
+              "id": "gemini",
+              "name": "Gemini",
+              "url": "https://gemini.google.com",
+              "description": "Google AI助手",
+              "keywords": ["Gemini", "AI", "Google", "对话"],
+              "icon": null
+            },
+            {
+              "id": "kimi",
+              "name": "Kimi",
+              "url": "https://kimi.moonshot.cn",
+              "description": "月之暗面AI助手，支持超长文本",
+              "keywords": ["Kimi", "AI", "长文本", "对话"],
+              "icon": null
+            },
+            {
+              "id": "doubao",
+              "name": "豆包",
+              "url": "https://www.doubao.com",
+              "description": "字节跳动AI助手",
+              "keywords": ["豆包", "AI", "字节", "对话"],
+              "icon": null
+            },
+            {
+              "id": "tongyi",
+              "name": "通义千问",
+              "url": "https://tongyi.aliyun.com",
+              "description": "阿里云AI助手",
+              "keywords": ["通义千问", "AI", "阿里", "对话"],
+              "icon": null
+            },
+            {
+              "id": "wenxin",
+              "name": "文心一言",
+              "url": "https://yiyan.baidu.com",
+              "description": "百度AI助手",
+              "keywords": ["文心一言", "AI", "百度", "对话"],
+              "icon": null
+            },
+            {
+              "id": "deepseek",
+              "name": "DeepSeek",
+              "url": "https://chat.deepseek.com",
+              "description": "DeepSeek AI助手",
+              "keywords": ["DeepSeek", "AI", "对话"],
+              "icon": null
+            },
+            {
+              "id": "ima",
+              "name": "IMA",
+              "url": "https://ima.qq.com",
+              "description": "腾讯IMA智能助手，AI阅读与知识管理",
+              "keywords": ["IMA", "AI", "腾讯", "知识", "阅读"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "ppt-poster-ai",
+          "name": "PPT海报AI",
+          "items": [
+            {
+              "id": "gamma",
+              "name": "Gamma",
+              "url": "https://gamma.app",
+              "description": "AI自动生成PPT/演示文稿",
+              "keywords": ["Gamma", "PPT", "AI", "演示", "幻灯片"],
+              "icon": null
+            },
+            {
+              "id": "beautiful-ai",
+              "name": "Beautiful.ai",
+              "url": "https://www.beautiful.ai",
+              "description": "AI智能PPT设计工具",
+              "keywords": ["Beautiful", "PPT", "AI", "设计"],
+              "icon": null
+            },
+            {
+              "id": "aippt",
+              "name": "AiPPT",
+              "url": "https://www.aippt.cn",
+              "description": "国产AI一键生成PPT",
+              "keywords": ["AiPPT", "PPT", "AI", "一键生成"],
+              "icon": null
+            },
+            {
+              "id": "mindshow",
+              "name": "MindShow",
+              "url": "https://www.mindshow.fun",
+              "description": "AI PPT创作平台",
+              "keywords": ["MindShow", "PPT", "AI", "演示"],
+              "icon": null
+            },
+            {
+              "id": "canva-ai",
+              "name": "Canva AI",
+              "url": "https://www.canva.com/ai-image-generator",
+              "description": "AI海报与设计生成",
+              "keywords": ["Canva", "海报", "AI", "设计", "图片"],
+              "icon": null
+            },
+            {
+              "id": "ideogram",
+              "name": "Ideogram",
+              "url": "https://ideogram.ai",
+              "description": "AI图像与海报生成",
+              "keywords": ["Ideogram", "AI", "图像", "海报"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "online-tools",
+          "name": "在线工具",
+          "items": [
+            {
+              "id": "qq-toolbox",
+              "name": "在线工具箱",
+              "url": "https://tool.browser.qq.com",
+              "description": "腾讯浏览器在线工具集合",
+              "keywords": ["工具箱", "在线工具", "QQ", "腾讯"],
+              "icon": null
+            },
+            {
+              "id": "baidu-fanyi",
+              "name": "百度翻译",
+              "url": "https://fanyi.baidu.com/mtpe-individual/multimodal",
+              "description": "百度多模态AI翻译工具",
+              "keywords": ["翻译", "百度", "多语言", "AI"],
+              "icon": null
+            },
+            {
+              "id": "airportal",
+              "name": "文件空投",
+              "url": "https://www.airportal.cn",
+              "description": "跨设备大文件快速传输",
+              "keywords": ["文件传输", "空投", "大文件", "跨设备"],
+              "icon": null
+            },
+            {
+              "id": "ilovepdf",
+              "name": "PDF工具箱",
+              "url": "https://www.ilovepdf.com/zh-cn",
+              "description": "在线PDF合并转换编辑",
+              "keywords": ["PDF", "转换", "合并", "工具"],
+              "icon": null
+            },
+            {
+              "id": "speedtest",
+              "name": "网速测试",
+              "url": "https://wangsuceshi.bmcx.com",
+              "description": "在线网络速度检测",
+              "keywords": ["网速", "测速", "网络", "带宽"],
+              "icon": null
+            },
+            {
+              "id": "virscan",
+              "name": "病毒扫描",
+              "url": "https://www.virscan.org",
+              "description": "在线多引擎文件病毒扫描",
+              "keywords": ["病毒", "扫描", "安全", "文件检测"],
+              "icon": null
+            },
+            {
+              "id": "wjx",
+              "name": "在线问卷",
+              "url": "https://www.wjx.cn",
+              "description": "问卷星在线问卷调查平台",
+              "keywords": ["问卷", "调查", "表单", "问卷星"],
+              "icon": null
+            }
+          ]
+        },
+        {
+          "id": "trend-analysis",
+          "name": "趋势分析",
+          "items": [
+            {
+              "id": "baidu-index",
+              "name": "百度指数",
+              "url": "https://index.baidu.com/v2/index.html",
+              "description": "百度关键词搜索趋势分析",
+              "keywords": ["百度指数", "趋势", "热词", "搜索"],
+              "icon": null
+            },
+            {
+              "id": "weixin-index",
+              "name": "微信指数",
+              "url": "https://weixin.qq.com",
+              "description": "微信平台热词趋势查询",
+              "keywords": ["微信指数", "趋势", "热词", "微信"],
+              "icon": null
+            },
+            {
+              "id": "juliang-suanshu",
+              "name": "巨量算数",
+              "url": "https://trendinsight.oceanengine.com",
+              "description": "字节跳动数据洞察趋势平台",
+              "keywords": ["巨量算数", "字节", "趋势", "数据", "抖音"],
+              "icon": null
+            },
+            {
+              "id": "360-trends",
+              "name": "360趋势",
+              "url": "https://trends.so.com",
+              "description": "360搜索热词趋势分析",
+              "keywords": ["360趋势", "热词", "搜索", "趋势"],
+              "icon": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
