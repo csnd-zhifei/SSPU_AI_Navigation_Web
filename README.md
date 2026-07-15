@@ -1,6 +1,8 @@
 # 二工大 AI 轻导航
 
 > AI驱动的个性化导航起始页，为上海第二工业大学师生打造高度可定制、信息层级清晰的学习导航体验。
+> 项目后端已转成fastapi版本，requirement.txt内的依赖与app_fastapi.py适配
+
 
 > 💡 **注意**：本项目由 AI 制作，作者仅在不断测试与优化。
 <img width="1926" height="1420" alt="image" src="https://github.com/user-attachments/assets/508000c8-7450-49f4-a544-ecda70fe5dd9" />
@@ -40,11 +42,10 @@ pip install -r requirements.txt
 # ZHIPU_API_KEY=your_api_key_here
 # FLASK_SECRET_KEY=your_flask_secret_key
 
-# 5. 运行应用
-python app.py
-```
+# 启动 FastAPI 版
+python app_fastapi.py
+# 或 uvicorn app_fastapi:app --reload --host 0.0.0.0 --port 5000
 
-打开浏览器访问 `http://localhost:5000`
 
 ## 📁 项目结构
 
